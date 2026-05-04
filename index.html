@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preparatório GCM Pouso Alegre 2026 | Edital Nº 01/2026</title>
+<title>Projeto GCM Pouso Alegre 2026 | Ranya & Jessé</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -146,9 +146,36 @@
     font-size: 20px;
     color: var(--silver);
     max-width: 620px;
-    margin: 20px auto 50px;
+    margin: 20px auto 30px;
     font-weight: 300;
     animation: fadeDown 0.8s 0.2s ease both;
+  }
+
+  .couple-photos {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.8s 0.3s ease both;
+  }
+  
+  .couple-photos img {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--gold);
+    box-shadow: 0 10px 30px rgba(201,168,76,0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .couple-photos img:first-child {
+    object-position: top center;
+  }
+  
+  .couple-photos img:hover {
+    transform: scale(1.05) translateY(-5px);
+    border-color: var(--gold-light);
   }
 
   .hero-stats {
@@ -811,6 +838,65 @@
     transform: translateY(0);
   }
 
+  /* ─── IMPACT SECTION ─── */
+  .impact-section {
+    padding: 60px 40px;
+    max-width: 1100px;
+    margin: 80px auto;
+    background: linear-gradient(145deg, rgba(22,34,53,0.8), rgba(201,168,76,0.05));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .impact-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .impact-content {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+  }
+  .impact-photo {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    border: 2px solid rgba(201,168,76,0.5);
+    flex-shrink: 0;
+  }
+  .impact-text {
+    flex: 1;
+  }
+  .impact-text h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    color: var(--gold);
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+  .impact-text p {
+    font-size: 24px;
+    color: var(--white);
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+  .impact-signature {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
   /* ─── INSCRICAO CTA ─── */
   .inscricao-cta {
     background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(10,14,26,0) 100%);
@@ -860,6 +946,10 @@
 
   /* ─── MOBILE ─── */
   @media (max-width: 768px) {
+    .impact-content { flex-direction: column; text-align: center; gap: 30px; }
+    .impact-photo { width: 100%; max-width: 320px; height: 320px; }
+    .impact-text h2 { font-size: 32px; }
+    .impact-text p { font-size: 20px; }
     nav { padding: 0 20px; }
     .nav-links { display: none; }
     section { padding: 60px 20px; }
@@ -879,7 +969,7 @@
 
 <!-- NAVIGATION -->
 <nav>
-  <div class="nav-logo">GCM <span>Pouso Alegre</span> 2026</div>
+  <div class="nav-logo">Ranya & Jessé <span>GCM 2026</span></div>
   <ul class="nav-links">
     <li><a href="#cronograma">Cronograma</a></li>
     <li><a href="#etapas">Etapas</a></li>
@@ -891,12 +981,17 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-badge">Edital Nº 01/2026 · IBGP · Município de Pouso Alegre/MG</div>
+  <div class="hero-badge">Projeto Casal · GCM Pouso Alegre/MG · 2026</div>
   <h1 class="hero-title">
-    Guarda Civil
-    <em>Municipal</em>
+    Ranya & Jessé
+    <em>Rumo à Aprovação</em>
   </h1>
-  <p class="hero-subtitle">Preparatório completo com videoaulas gratuitas, cronograma de estudos e tudo que você precisa saber sobre o concurso.</p>
+  <p class="hero-subtitle">"Um levanta o outro." Preparatório focado no nosso sucesso, com cronograma, videoaulas e metas para estudarmos e vencermos juntos.</p>
+
+  <div class="couple-photos">
+    <img src="img/ranyagcm.png" alt="Ranya">
+    <img src="img/Jesse gcm.png" alt="Jessé">
+  </div>
 
   <div class="hero-stats">
     <div class="stat-item">
@@ -1184,6 +1279,20 @@
       </tr>
     </tbody>
   </table>
+</section>
+
+<hr class="section-divider">
+
+<!-- IMPACT SECTION RANYA -->
+<section class="impact-section fade-in">
+  <div class="impact-content">
+    <img src="img/ranya gcm.png" alt="Ranya GCM" class="impact-photo">
+    <div class="impact-text">
+      <h2>O Futuro é Nosso, Ranya!</h2>
+      <p>"Cada minuto de estudo hoje é um passo mais perto da nossa vitória amanhã. Eu acredito em você, levanta a cabeça e vamos juntos conquistar essa farda!"</p>
+      <span class="impact-signature">— Com amor, Jessé</span>
+    </div>
+  </div>
 </section>
 
 <hr class="section-divider">
@@ -1548,7 +1657,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">GCM Pouso Alegre 2026</div>
+  <div class="footer-logo">Ranya & Jessé — GCM Pouso Alegre 2026</div>
   <p class="footer-text">
     Preparatório não oficial para o Concurso Público da Guarda Civil Municipal de Pouso Alegre/MG, Edital Nº 01/2026, organizado pelo IBGP. Os links de videoaulas direcionam para conteúdo de terceiros disponível no YouTube.
   </p>
