@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preparatório GCM Pouso Alegre 2026 | Edital Nº 01/2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dark: #8B6914;
+    --navy: #0A0E1A;
+    --navy-mid: #111827;
+    --navy-light: #1C2A3A;
+    --navy-card: #162235;
+    --silver: #A8B2C0;
+    --white: #F0EDE8;
+    --red: #C0392B;
+    --green: #1E8449;
+    --blue-accent: #1A6B8A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.3;
+  }
+
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(10,14,26,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    z-index: 100;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .nav-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .nav-logo span { color: var(--white); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--silver);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 20% 100%, rgba(26,107,138,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 6px 18px;
+    margin-bottom: 36px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(38px, 6vw, 80px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--white);
+    max-width: 900px;
+    animation: fadeDown 0.8s 0.1s ease both;
+    margin-bottom: 8px;
+  }
+
+  .hero-title em {
+    color: var(--gold);
+    font-style: normal;
+    display: block;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+    color: var(--silver);
+    max-width: 620px;
+    margin: 20px auto 50px;
+    font-weight: 300;
+    animation: fadeDown 0.8s 0.2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid rgba(201,168,76,0.2);
+    animation: fadeDown 0.8s 0.3s ease both;
+    margin-bottom: 48px;
+  }
+
+  .stat-item {
+    padding: 24px 40px;
+    border-right: 1px solid rgba(201,168,76,0.2);
+    text-align: center;
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-top: 6px;
+    display: block;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeDown 0.8s 0.4s ease both;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 14px 36px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--gold);
+    padding: 14px 36px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid rgba(201,168,76,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.08);
+  }
+
+  /* ─── COUNTDOWN ─── */
+  .countdown-section {
+    background: var(--navy-card);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding: 48px 40px;
+    text-align: center;
+  }
+
+  .countdown-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  .countdown-grid {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .countdown-unit {
+    background: var(--navy);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 20px 28px;
+    min-width: 90px;
+  }
+
+  .countdown-num {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .countdown-unit-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-top: 6px;
+    display: block;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    padding: 100px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 64px;
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 4px 10px;
+    white-space: nowrap;
+    margin-top: 8px;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.1;
+  }
+
+  .section-subtitle {
+    font-size: 17px;
+    color: var(--silver);
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  /* ─── CRONOGRAMA ─── */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+    background: var(--navy-card);
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 28px 32px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .timeline-item:hover {
+    border-color: rgba(201,168,76,0.4);
+    transform: translateX(4px);
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -48px;
+    top: 32px;
+    width: 14px;
+    height: 14px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.2);
+  }
+
+  .timeline-item.past { opacity: 0.5; }
+  .timeline-item.active {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+
+  .timeline-item.active::before {
+    background: var(--gold-light);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(201,168,76,0.2); }
+    50% { box-shadow: 0 0 0 8px rgba(201,168,76,0.1); }
+  }
+
+  .timeline-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .timeline-event {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .timeline-detail {
+    font-size: 15px;
+    color: var(--silver);
+  }
+
+  .timeline-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  .tag-active { background: rgba(201,168,76,0.2); color: var(--gold); border: 1px solid rgba(201,168,76,0.4); }
+  .tag-upcoming { background: rgba(26,107,138,0.2); color: #5BB8D4; border: 1px solid rgba(91,184,212,0.3); }
+  .tag-important { background: rgba(192,57,43,0.2); color: #E74C3C; border: 1px solid rgba(231,76,60,0.3); }
+
+  /* ─── MATERIAS ─── */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+
+  .subject-card {
+    background: var(--navy-card);
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .subject-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .subject-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  }
+
+  .subject-card.featured {
+    border-color: rgba(201,168,76,0.4);
+    grid-column: span 2;
+  }
+
+  .subject-icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .subject-name {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .subject-meta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border: 1px solid;
+  }
+
+  .pill-questoes { color: #5BB8D4; border-color: rgba(91,184,212,0.3); background: rgba(91,184,212,0.08); }
+  .pill-pontos { color: var(--gold); border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.08); }
+  .pill-peso { color: #A8D8A8; border-color: rgba(168,216,168,0.3); background: rgba(168,216,168,0.08); }
+
+  .subject-topics {
+    list-style: none;
+    margin-bottom: 24px;
+  }
+
+  .subject-topics li {
+    font-size: 14px;
+    color: var(--silver);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subject-topics li::before {
+    content: '—';
+    color: var(--gold-dark);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .video-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .video-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.15);
+    color: var(--gold-light);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: 'Crimson Pro', serif;
+    transition: all 0.2s;
+  }
+
+  .video-link:hover {
+    background: rgba(201,168,76,0.14);
+    border-color: rgba(201,168,76,0.4);
+  }
+
+  .video-link-icon {
+    width: 28px;
+    height: 28px;
+    background: #FF0000;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .video-bar {
+    height: 3px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    margin-bottom: 8px;
+  }
+
+  /* ─── VAGAS E REQUISITOS ─── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .info-card {
+    background: var(--navy-card);
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 32px;
+  }
+
+  .info-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    gap: 16px;
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-key {
+    font-size: 14px;
+    color: var(--silver);
+    font-weight: 300;
+    flex-shrink: 0;
+  }
+
+  .info-val {
+    font-size: 15px;
+    color: var(--white);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  /* ─── ETAPAS ─── */
+  .etapas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .etapa-card {
+    background: var(--navy-card);
+    border: 1px solid rgba(201,168,76,0.1);
+    padding: 28px;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .etapa-card:hover {
+    border-color: rgba(201,168,76,0.35);
+  }
+
+  .etapa-num {
+    font-family: 'Cinzel', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: rgba(201,168,76,0.15);
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    line-height: 1;
+  }
+
+  .etapa-tipo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .etapa-nome {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .etapa-desc {
+    font-size: 14px;
+    color: var(--silver);
+    line-height: 1.6;
+  }
+
+  .etapa-badge {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-elim { background: rgba(192,57,43,0.15); color: #E74C3C; border: 1px solid rgba(231,76,60,0.3); }
+  .badge-class { background: rgba(26,132,73,0.15); color: #58D68D; border: 1px solid rgba(88,214,141,0.3); }
+  .badge-both { background: rgba(26,107,138,0.15); color: #5BB8D4; border: 1px solid rgba(91,184,212,0.3); }
+
+  /* ─── PROVA OBJETIVA DETAILS ─── */
+  .prova-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+  }
+
+  .prova-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.05);
+  }
+
+  .prova-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 16px;
+    color: var(--white);
+  }
+
+  .prova-table tr:hover td { background: rgba(201,168,76,0.04); }
+
+  .prova-table .materia { color: var(--silver); font-weight: 300; font-size: 14px; }
+  .prova-table .destaque { color: var(--gold); font-family: 'Cinzel', serif; font-weight: 700; }
+  .prova-table .total-row td {
+    background: rgba(201,168,76,0.08);
+    border-top: 1px solid rgba(201,168,76,0.3);
+    font-weight: 700;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+  }
+
+  /* ─── ALERT ─── */
+  .alert-box {
+    background: rgba(192,57,43,0.1);
+    border: 1px solid rgba(231,76,60,0.3);
+    border-left: 4px solid #E74C3C;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    color: var(--white);
+  }
+
+  .alert-box strong { color: #E74C3C; }
+
+  .success-box {
+    background: rgba(26,132,73,0.1);
+    border: 1px solid rgba(88,214,141,0.3);
+    border-left: 4px solid #58D68D;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    color: var(--white);
+  }
+
+  .success-box strong { color: #58D68D; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--navy-card);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding: 60px 40px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .footer-text {
+    font-size: 14px;
+    color: var(--silver);
+    max-width: 600px;
+    margin: 0 auto 24px;
+    line-height: 1.8;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .footer-links a:hover { color: var(--gold-light); }
+
+  .footer-copy {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(168,178,192,0.4);
+    letter-spacing: 1px;
+  }
+
+  /* ─── DIVIDER ─── */
+  .section-divider {
+    border: none;
+    border-top: 1px solid rgba(201,168,76,0.12);
+    margin: 0;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── INSCRICAO CTA ─── */
+  .inscricao-cta {
+    background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(10,14,26,0) 100%);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 60px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cta-title {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .cta-dates {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 32px 0;
+    flex-wrap: wrap;
+  }
+
+  .cta-date-item {
+    text-align: center;
+  }
+
+  .cta-date-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .cta-date-val {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { flex-direction: column; }
+    .stat-item { border-right: none; border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .subjects-grid { grid-template-columns: 1fr; }
+    .subject-card.featured { grid-column: span 1; }
+    .info-grid { grid-template-columns: 1fr; }
+    .inscricao-cta { padding: 40px 24px; }
+    .hero-stats .stat-item { padding: 16px 24px; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-logo">GCM <span>Pouso Alegre</span> 2026</div>
+  <ul class="nav-links">
+    <li><a href="#cronograma">Cronograma</a></li>
+    <li><a href="#etapas">Etapas</a></li>
+    <li><a href="#materias">Matérias</a></li>
+    <li><a href="#vagas">Vagas</a></li>
+    <li><a href="#inscricao">Inscrição</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Edital Nº 01/2026 · IBGP · Município de Pouso Alegre/MG</div>
+  <h1 class="hero-title">
+    Guarda Civil
+    <em>Municipal</em>
+  </h1>
+  <p class="hero-subtitle">Preparatório completo com videoaulas gratuitas, cronograma de estudos e tudo que você precisa saber sobre o concurso.</p>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num">50</span>
+      <span class="stat-label">Vagas</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">R$&nbsp;4.160</span>
+      <span class="stat-label">Remuneração</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">R$&nbsp;80</span>
+      <span class="stat-label">Taxa de Inscrição</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">40</span>
+      <span class="stat-label">Questões</span>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#materias" class="btn-primary">▶ Ver Videoaulas</a>
+    <a href="#cronograma" class="btn-secondary">Cronograma</a>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown-section">
+  <p class="countdown-label">⏱ Contagem regressiva para a prova objetiva — 26/07/2026</p>
+  <div class="countdown-grid">
+    <div class="countdown-unit">
+      <span class="countdown-num" id="days">--</span>
+      <span class="countdown-unit-label">Dias</span>
+    </div>
+    <div class="countdown-unit">
+      <span class="countdown-num" id="hours">--</span>
+      <span class="countdown-unit-label">Horas</span>
+    </div>
+    <div class="countdown-unit">
+      <span class="countdown-num" id="minutes">--</span>
+      <span class="countdown-unit-label">Min</span>
+    </div>
+    <div class="countdown-unit">
+      <span class="countdown-num" id="seconds">--</span>
+      <span class="countdown-unit-label">Seg</span>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- CRONOGRAMA -->
+<section id="cronograma">
+  <div class="section-header fade-in">
+    <span class="section-number">01</span>
+    <div>
+      <h2 class="section-title">Cronograma<br>Oficial</h2>
+      <p class="section-subtitle">Todas as datas previstas no Edital Nº 01/2026</p>
+    </div>
+  </div>
+
+  <div class="timeline fade-in">
+
+    <div class="timeline-item">
+      <div class="timeline-date">02 JUN 2026 — 05 JUN 2026</div>
+      <div class="timeline-event">Período de Isenção de Taxa <span class="timeline-tag tag-important">Prazo curto</span></div>
+      <div class="timeline-detail">Das 09h do dia 02/06 às 16h do dia 05/06. Desempregados, baixa renda (CadÚnico) e doadores de medula podem solicitar. Enviar documentação via upload no site do IBGP.</div>
+    </div>
+
+    <div class="timeline-item active">
+      <div class="timeline-date">02 JUN 2026 — 02 JUL 2026</div>
+      <div class="timeline-event">📌 Período de Inscrições <span class="timeline-tag tag-active">Em andamento</span></div>
+      <div class="timeline-detail">Das 09h do dia 02/06/2026 às 16h do dia 02/07/2026. Exclusivamente via internet: www.ibgpconcursos.com.br. Taxa: R$ 80,00 — pagar até 03/07/2026.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Até 11 JUN 2026</div>
+      <div class="timeline-event">Resultado das Isenções</div>
+      <div class="timeline-detail">Publicação dos resultados de isenção de taxa de inscrição no endereço eletrônico www.ibgpconcursos.com.br.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Até 03 JUL 2026</div>
+      <div class="timeline-event">Prazo final para pagamento do boleto</div>
+      <div class="timeline-detail">O boleto deve ser pago até o dia 03/07/2026. Aguardar mínimo 2h após emissão antes de pagar. Não são aceitos PIX, TED, DOC ou depósito direto.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Até 14 JUL 2026</div>
+      <div class="timeline-event">Retificação de Autodeclaração de Negros</div>
+      <div class="timeline-detail">Candidatos que desejam retificar a autodeclaração de cor/raça devem enviar e-mail para contato@ibgp.org.br até esta data.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Até 09 JUL 2026</div>
+      <div class="timeline-event">Divulgação das Inscrições Deferidas</div>
+      <div class="timeline-detail">Publicação das inscrições deferidas e indeferidas (inclusive para PcD e pretos/pardos) no site do IBGP. Candidato com inscrição indeferida pode interpor recurso.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">26 JUL 2026 (Domingo)</div>
+      <div class="timeline-event">🎯 Prova Objetiva <span class="timeline-tag tag-upcoming">Data principal</span></div>
+      <div class="timeline-detail">Único turno. Portões fecham às 09h00 (Brasília). Prova inicia às 09h15. Duração: 4 horas. Local: cidade de Pouso Alegre/MG. Levar documento com foto e caneta esferográfica azul ou preta transparente.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Previsão: AGO/SET 2026</div>
+      <div class="timeline-event">Prova de Capacidade Física e Avaliação de Altura</div>
+      <div class="timeline-detail">2ª Etapa — Eliminatório e Classificatório. Serão convocados 7x o nº de vagas por categoria. Exige atestado médico (máx. 30 dias antes). Altura mínima: 1,60m (masc.) e 1,55m (fem.).</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Previsão: SET/OUT 2026</div>
+      <div class="timeline-event">Avaliação Psicológica</div>
+      <div class="timeline-detail">3ª Etapa — Eliminatório. Serão convocados 5x o nº de vagas. Realizada por psicólogo credenciado pela Polícia Federal. Resultado: Indicado ou Contraindicado.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Previsão: OUT/NOV 2026</div>
+      <div class="timeline-event">Avaliação Clínica</div>
+      <div class="timeline-detail">4ª Etapa — Eliminatório. Todos os candidatos indicados na avaliação psicológica. Exames médicos realizados às expensas do candidato (ver Anexo VIII do Edital).</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Previsão: NOV/DEZ 2026</div>
+      <div class="timeline-event">Investigação Social (Sindicância)</div>
+      <div class="timeline-detail">5ª Etapa — Eliminatório. Certidões criminais, documentos pessoais, pesquisa de vida pregressa. Validade máxima das certidões: 90 dias.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Previsão: 2027</div>
+      <div class="timeline-event">Curso de Formação — FASE II</div>
+      <div class="timeline-detail">70 candidatos. Carga horária: 1.266h/aula. Caráter eliminatório. Nota mínima: 70 pontos por disciplina. Frequência mínima: 95%. Bolsa: 70% da remuneração base + auxílio uniforme.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">Validade do concurso</div>
+      <div class="timeline-event">Validade do Concurso: 2 anos</div>
+      <div class="timeline-detail">A contar da data de homologação do resultado final, podendo ser prorrogado por igual período.</div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ETAPAS DO CONCURSO -->
+<section id="etapas">
+  <div class="section-header fade-in">
+    <span class="section-number">02</span>
+    <div>
+      <h2 class="section-title">Etapas do<br>Concurso</h2>
+      <p class="section-subtitle">Seis etapas distribuídas em duas fases</p>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 24px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase;">◆ FASE I</div>
+
+  <div class="etapas-grid fade-in">
+    <div class="etapa-card">
+      <div class="etapa-num">1</div>
+      <div class="etapa-tipo">1ª Etapa</div>
+      <div class="etapa-nome">Prova Objetiva de Múltipla Escolha</div>
+      <div class="etapa-desc">40 questões com 4 alternativas (A, B, C, D). Aprovação mínima: 50% (50 pontos). Duração: 4 horas. Data: 26/07/2026.</div>
+      <span class="etapa-badge badge-both">Eliminatório + Classificatório</span>
+    </div>
+
+    <div class="etapa-card">
+      <div class="etapa-num">2</div>
+      <div class="etapa-tipo">2ª Etapa</div>
+      <div class="etapa-nome">Prova de Capacidade Física e Avaliação de Altura</div>
+      <div class="etapa-desc">Barra fixa, flexão abdominal remador e corrida de 12 minutos. Altura mín.: 1,60m (masc.) / 1,55m (fem.). Convocados: 7× vagas por categoria.</div>
+      <span class="etapa-badge badge-both">Eliminatório + Classificatório</span>
+    </div>
+
+    <div class="etapa-card">
+      <div class="etapa-num">3</div>
+      <div class="etapa-tipo">3ª Etapa</div>
+      <div class="etapa-nome">Avaliação Psicológica</div>
+      <div class="etapa-desc">Testes cognitivos e de personalidade. Realizado por psicólogo credenciado pela PF. Convocados: 5× vagas por categoria. Resultado: Indicado ou Contraindicado.</div>
+      <span class="etapa-badge badge-elim">Eliminatório</span>
+    </div>
+
+    <div class="etapa-card">
+      <div class="etapa-num">4</div>
+      <div class="etapa-tipo">4ª Etapa</div>
+      <div class="etapa-nome">Avaliação Clínica</div>
+      <div class="etapa-desc">Exames médicos e laboratoriais (ver Anexo VIII). Realizados às expensas do candidato. Todos os aprovados na 3ª etapa são convocados.</div>
+      <span class="etapa-badge badge-elim">Eliminatório</span>
+    </div>
+
+    <div class="etapa-card">
+      <div class="etapa-num">5</div>
+      <div class="etapa-tipo">5ª Etapa</div>
+      <div class="etapa-nome">Investigação Social (Sindicância)</div>
+      <div class="etapa-desc">Análise de documentos, certidões criminais, conduta pública e vida pregressa. Validade das certidões: máx. 90 dias.</div>
+      <span class="etapa-badge badge-elim">Eliminatório</span>
+    </div>
+  </div>
+
+  <div style="margin: 40px 0 24px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase;">◆ FASE II</div>
+
+  <div class="etapas-grid fade-in">
+    <div class="etapa-card" style="border-color: rgba(201,168,76,0.35);">
+      <div class="etapa-num">6</div>
+      <div class="etapa-tipo">6ª Etapa — Fase Final</div>
+      <div class="etapa-nome">Curso de Formação</div>
+      <div class="etapa-desc">70 vagas. Carga horária: 1.266h/aula. Nota mínima por disciplina: 70 pontos. Frequência mínima: 95%. Bolsa indenizatória: 70% do salário base + auxílio uniforme. Ocorre em tempo integral, inclusive finais de semana.</div>
+      <span class="etapa-badge badge-elim">Eliminatório</span>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- PROVA OBJETIVA DETALHES -->
+<section>
+  <div class="section-header fade-in">
+    <span class="section-number">03</span>
+    <div>
+      <h2 class="section-title">Prova Objetiva<br>— Detalhes</h2>
+      <p class="section-subtitle">Distribuição de questões, pesos e pontuações</p>
+    </div>
+  </div>
+
+  <div class="alert-box fade-in">
+    <strong>⚠ Atenção:</strong> Para ser aprovado na Prova Objetiva, o candidato deve obter no mínimo <strong>50% do total de pontos (50 pontos)</strong>. Não há nota mínima por disciplina nesta etapa.
+  </div>
+
+  <div class="success-box fade-in">
+    <strong>📅 Data:</strong> 26 de julho de 2026 (domingo) — Início às 09h15 (Brasília) — Duração: 4 horas — Local: Pouso Alegre/MG
+  </div>
+
+  <table class="prova-table fade-in">
+    <thead>
+      <tr>
+        <th>Parte</th>
+        <th>Conteúdo</th>
+        <th>Questões</th>
+        <th>Peso</th>
+        <th>Pontuação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="materia">1ª</td>
+        <td>Língua Portuguesa</td>
+        <td class="destaque">10</td>
+        <td>2,5</td>
+        <td class="destaque">25,0</td>
+      </tr>
+      <tr>
+        <td class="materia">2ª</td>
+        <td>Raciocínio Lógico Matemático</td>
+        <td class="destaque">5</td>
+        <td>2,0</td>
+        <td class="destaque">10,0</td>
+      </tr>
+      <tr>
+        <td class="materia">3ª</td>
+        <td>Noções de Informática</td>
+        <td class="destaque">5</td>
+        <td>2,0</td>
+        <td class="destaque">10,0</td>
+      </tr>
+      <tr>
+        <td class="materia">4ª</td>
+        <td>História de Pouso Alegre e Geografia Urbana</td>
+        <td class="destaque">5</td>
+        <td>2,0</td>
+        <td class="destaque">10,0</td>
+      </tr>
+      <tr>
+        <td class="materia">5ª</td>
+        <td>Conhecimentos Específicos – Legislações</td>
+        <td class="destaque">15</td>
+        <td>3,0</td>
+        <td class="destaque">45,0</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="2">TOTAL</td>
+        <td>40</td>
+        <td>—</td>
+        <td>100,0</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="section-divider">
+
+<!-- MATERIAS E VIDEOAULAS -->
+<section id="materias">
+  <div class="section-header fade-in">
+    <span class="section-number">04</span>
+    <div>
+      <h2 class="section-title">Matérias &<br>Videoaulas</h2>
+      <p class="section-subtitle">Acesse gratuitamente conteúdo para cada disciplina da prova</p>
+    </div>
+  </div>
+
+  <div class="subjects-grid fade-in">
+
+    <!-- CONHECIMENTOS ESPECIFICOS - MAIOR PESO -->
+    <div class="subject-card featured">
+      <div class="video-bar" style="background: linear-gradient(to right, var(--red), var(--gold));"></div>
+      <span class="subject-icon">⚖️</span>
+      <div class="subject-name">Conhecimentos Específicos — Legislações</div>
+      <div class="subject-meta">
+        <span class="meta-pill pill-questoes">15 questões</span>
+        <span class="meta-pill pill-pontos">45 pontos</span>
+        <span class="meta-pill pill-peso">Peso 3,0</span>
+      </div>
+      <ul class="subject-topics">
+        <li>Constituição Federal/88 — Direitos e Garantias Fundamentais (Art. 5º)</li>
+        <li>Lei Federal nº 13.022/2014 — Estatuto Geral das Guardas Municipais</li>
+        <li>Decreto Federal nº 11.841/2023 — Cooperação das Guardas Municipais</li>
+        <li>Lei Municipal nº 7.045/2025 — Criação da GCM de Pouso Alegre</li>
+        <li>Lei Municipal nº 7.229/2026 — Estatuto da GCM-PA</li>
+        <li>Direitos Humanos e Cidadania</li>
+        <li>Código Penal e Código de Processo Penal (noções)</li>
+        <li>Lei de Improbidade Administrativa</li>
+        <li>Estatuto do Desarmamento</li>
+        <li>Noções de Defesa Social e Segurança Pública Municipal</li>
+      </ul>
+      <div class="video-links">
+        <a class="video-link" href="https://www.youtube.com/results?search_query=estatuto+guarda+civil+municipal+lei+13022+concurso" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Lei 13.022/2014 — Estatuto das Guardas Municipais completo
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=constituição+federal+art+5+direitos+fundamentais+concurso" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> CF/88 — Direitos e Garantias Fundamentais (Art. 5º)
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=direito+constitucional+segurança+pública+art+144+concurso" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> CF/88 — Segurança Pública (Art. 144) e Guardas Municipais
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=código+penal+noções+concurso+guarda+municipal" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Noções de Direito Penal para Guardas Municipais
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=direitos+humanos+segurança+pública+concurso+gratuito" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Direitos Humanos aplicados à Segurança Pública
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=estatuto+desarmamento+lei+10826+concurso+policial" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Estatuto do Desarmamento — Lei 10.826/2003
+        </a>
+      </div>
+    </div>
+
+    <!-- LINGUA PORTUGUESA -->
+    <div class="subject-card">
+      <div class="video-bar"></div>
+      <span class="subject-icon">📖</span>
+      <div class="subject-name">Língua Portuguesa</div>
+      <div class="subject-meta">
+        <span class="meta-pill pill-questoes">10 questões</span>
+        <span class="meta-pill pill-pontos">25 pontos</span>
+        <span class="meta-pill pill-peso">Peso 2,5</span>
+      </div>
+      <ul class="subject-topics">
+        <li>Interpretação e compreensão de textos</li>
+        <li>Ortografia e acentuação gráfica</li>
+        <li>Classes e flexão de palavras</li>
+        <li>Concordância nominal e verbal</li>
+        <li>Regência nominal e verbal</li>
+        <li>Crase e pontuação</li>
+        <li>Coesão e coerência textual</li>
+        <li>Sinônimos, antônimos e parônimos</li>
+      </ul>
+      <div class="video-links">
+        <a class="video-link" href="https://www.youtube.com/results?search_query=língua+portuguesa+interpretação+de+texto+concurso+público+gratuito" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Interpretação de Texto — Concurso Público
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=concordância+verbal+nominal+concurso+gratuito" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Concordância Verbal e Nominal
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=regência+verbal+nominal+crase+concurso+aula" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Regência e Crase — Aula Completa
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=português+ortografia+acentuação+concurso+público" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Ortografia e Acentuação Gráfica
+        </a>
+      </div>
+    </div>
+
+    <!-- RACIOCINIO LOGICO -->
+    <div class="subject-card">
+      <div class="video-bar" style="background: linear-gradient(to right, #5BB8D4, transparent);"></div>
+      <span class="subject-icon">🧠</span>
+      <div class="subject-name">Raciocínio Lógico Matemático</div>
+      <div class="subject-meta">
+        <span class="meta-pill pill-questoes">5 questões</span>
+        <span class="meta-pill pill-pontos">10 pontos</span>
+        <span class="meta-pill pill-peso">Peso 2,0</span>
+      </div>
+      <ul class="subject-topics">
+        <li>Proposições lógicas e conectivos</li>
+        <li>Tabelas-verdade</li>
+        <li>Silogismos e deduções</li>
+        <li>Sequências numéricas e alfanuméricas</li>
+        <li>Raciocínio analítico (diagramas)</li>
+        <li>Operações com conjuntos</li>
+        <li>Porcentagem e proporcionalidade</li>
+      </ul>
+      <div class="video-links">
+        <a class="video-link" href="https://www.youtube.com/results?search_query=raciocínio+lógico+proposições+concurso+público+gratuito" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Lógica — Proposições e Conectivos
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=raciocínio+lógico+sequências+numéricas+concurso" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Sequências e Padrões Numéricos
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=raciocínio+analítico+silogismos+concurso+aula+gratuita" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Silogismos e Raciocínio Analítico
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=porcentagem+proporcionalidade+matemática+concurso" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Porcentagem e Proporcionalidade
+        </a>
+      </div>
+    </div>
+
+    <!-- INFORMATICA -->
+    <div class="subject-card">
+      <div class="video-bar" style="background: linear-gradient(to right, #58D68D, transparent);"></div>
+      <span class="subject-icon">💻</span>
+      <div class="subject-name">Noções de Informática</div>
+      <div class="subject-meta">
+        <span class="meta-pill pill-questoes">5 questões</span>
+        <span class="meta-pill pill-pontos">10 pontos</span>
+        <span class="meta-pill pill-peso">Peso 2,0</span>
+      </div>
+      <ul class="subject-topics">
+        <li>Windows 10/11 — Recursos e funcionalidades</li>
+        <li>Microsoft Office (Word, Excel, PowerPoint)</li>
+        <li>Internet e navegadores (Chrome, Edge, Firefox)</li>
+        <li>E-mail e segurança digital</li>
+        <li>Vírus, malware e antivírus</li>
+        <li>Noções de redes e conectividade</li>
+        <li>Conceitos de hardware e software</li>
+      </ul>
+      <div class="video-links">
+        <a class="video-link" href="https://www.youtube.com/results?search_query=informática+básica+windows+concurso+público+gratuito" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Windows 10/11 para Concursos
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=pacote+office+word+excel+concurso+público+aula" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Microsoft Office — Word, Excel e PowerPoint
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=internet+segurança+digital+concurso+público+informática" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Internet, Segurança e E-mail
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=hardware+software+redes+informática+concurso+gratuito" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Hardware, Software e Redes — Conceitos Básicos
+        </a>
+      </div>
+    </div>
+
+    <!-- HISTORIA POUSO ALEGRE -->
+    <div class="subject-card">
+      <div class="video-bar" style="background: linear-gradient(to right, #E59866, transparent);"></div>
+      <span class="subject-icon">🏙️</span>
+      <div class="subject-name">História de Pouso Alegre e Geografia Urbana</div>
+      <div class="subject-meta">
+        <span class="meta-pill pill-questoes">5 questões</span>
+        <span class="meta-pill pill-pontos">10 pontos</span>
+        <span class="meta-pill pill-peso">Peso 2,0</span>
+      </div>
+      <ul class="subject-topics">
+        <li>Formação histórica de Pouso Alegre/MG</li>
+        <li>Aspectos geográficos e localização</li>
+        <li>Economia e desenvolvimento regional</li>
+        <li>Cultura, patrimônio e identidade local</li>
+        <li>Organização político-administrativa municipal</li>
+        <li>Bairros, regiões e infraestrutura urbana</li>
+        <li>Dados demográficos e municipais recentes</li>
+      </ul>
+      <div class="video-links">
+        <a class="video-link" href="https://www.youtube.com/results?search_query=história+pouso+alegre+minas+gerais+cidade" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> História de Pouso Alegre/MG
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=pouso+alegre+minas+gerais+geografia+economia" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Geografia e Economia de Pouso Alegre
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=sul+de+minas+gerais+história+municípios+cultura" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Sul de Minas Gerais — Cultura e Municípios
+        </a>
+        <a class="video-link" href="https://www.youtube.com/results?search_query=administração+municipal+prefeitura+estrutura+organização" target="_blank" rel="noopener">
+          <span class="video-link-icon">▶</span> Organização Político-Administrativa Municipal
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- VAGAS E INFORMAÇÕES -->
+<section id="vagas">
+  <div class="section-header fade-in">
+    <span class="section-number">05</span>
+    <div>
+      <h2 class="section-title">Vagas &<br>Requisitos</h2>
+      <p class="section-subtitle">Distribuição de vagas, remuneração e requisitos mínimos</p>
+    </div>
+  </div>
+
+  <div class="info-grid fade-in">
+
+    <div class="info-card">
+      <h3>📊 Distribuição de Vagas</h3>
+      <div class="info-row">
+        <span class="info-key">Ampla Concorrência</span>
+        <span class="info-val">25 vagas</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Pessoas com Deficiência (PcD)</span>
+        <span class="info-val">5 vagas (10%)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Candidatos Negros (Pretos/Pardos)</span>
+        <span class="info-val">10 vagas (20%)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Candidatas do Sexo Feminino</span>
+        <span class="info-val">10 vagas (20%)</span>
+      </div>
+      <div class="info-row" style="border-top: 1px solid rgba(201,168,76,0.3); margin-top: 8px; padding-top: 16px;">
+        <span class="info-key" style="color: var(--gold); font-weight: 600;">TOTAL</span>
+        <span class="info-val" style="color: var(--gold); font-size: 20px;">50 vagas</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>💰 Remuneração e Benefícios</h3>
+      <div class="info-row">
+        <span class="info-key">Vencimento base</span>
+        <span class="info-val">R$ 3.200,00</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Adicional de Periculosidade (30%)</span>
+        <span class="info-val">R$ 960,00</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Auxílio Alimentação</span>
+        <span class="info-val">R$ 550,00/mês</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Progressões de Carreira</span>
+        <span class="info-val">Plano de Carreira</span>
+      </div>
+      <div class="info-row" style="border-top: 1px solid rgba(201,168,76,0.3); margin-top: 8px; padding-top: 16px;">
+        <span class="info-key" style="color: var(--gold); font-weight: 600;">Remuneração Total</span>
+        <span class="info-val" style="color: var(--gold); font-size: 20px;">R$ 4.160,00</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>✅ Requisitos Mínimos</h3>
+      <div class="info-row">
+        <span class="info-key">Escolaridade</span>
+        <span class="info-val">Ensino Médio Completo</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Idade mínima</span>
+        <span class="info-val">18 anos</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Idade máxima (nomeação)</span>
+        <span class="info-val">35 anos</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Altura mínima — Masculino</span>
+        <span class="info-val">1,60 m</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Altura mínima — Feminino</span>
+        <span class="info-val">1,55 m</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">CNH</span>
+        <span class="info-val">Válida (qualquer categoria)</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>📋 Informações da Prova Física</h3>
+      <div class="info-row">
+        <span class="info-key">Força membros superiores (Masc.)</span>
+        <span class="info-val">Barra fixa dinâmica</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Força membros superiores (Fem.)</span>
+        <span class="info-val">Barra fixa estática</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Abdominais</span>
+        <span class="info-val">Flexão Abdominal Remador</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Resistência Aeróbica</span>
+        <span class="info-val">Corrida 12 minutos</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Pontuação mínima</span>
+        <span class="info-val">30 pontos (sem zerar)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Atestado médico exigido</span>
+        <span class="info-val">Máx. 30 dias antes</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- INSCRICAO CTA -->
+<section id="inscricao">
+  <div class="inscricao-cta fade-in">
+    <div class="hero-badge" style="margin-bottom: 24px;">📌 Inscrições abertas</div>
+    <h2 class="cta-title">Inscreva-se Agora</h2>
+    <p style="color: var(--silver); font-size: 18px; max-width: 500px; margin: 0 auto;">As inscrições são exclusivamente online. Acesse o site do IBGP e realize sua inscrição dentro do prazo.</p>
+
+    <div class="cta-dates">
+      <div class="cta-date-item">
+        <span class="cta-date-label">Inscrições abertas</span>
+        <span class="cta-date-val">02/06/2026</span>
+      </div>
+      <div style="color: rgba(201,168,76,0.3); font-size: 24px; padding-top: 16px;">→</div>
+      <div class="cta-date-item">
+        <span class="cta-date-label">Encerramento</span>
+        <span class="cta-date-val">02/07/2026</span>
+      </div>
+      <div style="color: rgba(201,168,76,0.3); font-size: 24px; padding-top: 16px;">→</div>
+      <div class="cta-date-item">
+        <span class="cta-date-label">Pagamento até</span>
+        <span class="cta-date-val">03/07/2026</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href="https://www.ibgpconcursos.com.br" target="_blank" rel="noopener" class="btn-primary">Acessar Site de Inscrições (IBGP)</a>
+      <a href="https://www.pousoalegre.mg.gov.br" target="_blank" rel="noopener" class="btn-secondary">Site Prefeitura de Pouso Alegre</a>
+    </div>
+
+    <div style="margin-top: 32px; padding: 20px; background: rgba(192,57,43,0.1); border: 1px solid rgba(231,76,60,0.3); font-size: 14px; color: var(--silver);">
+      ⚠ <strong style="color: #E74C3C;">Isenção de taxa:</strong> Solicitar de 02/06 a 05/06/2026 — Prazo muito curto! Taxa: <strong style="color: var(--white);">R$ 80,00</strong> — Pago via boleto bancário. Sem PIX ou TED.
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">GCM Pouso Alegre 2026</div>
+  <p class="footer-text">
+    Preparatório não oficial para o Concurso Público da Guarda Civil Municipal de Pouso Alegre/MG, Edital Nº 01/2026, organizado pelo IBGP. Os links de videoaulas direcionam para conteúdo de terceiros disponível no YouTube.
+  </p>
+  <div class="footer-links">
+    <a href="https://www.ibgpconcursos.com.br" target="_blank">IBGP — Site Oficial</a>
+    <a href="https://www.pousoalegre.mg.gov.br" target="_blank">Prefeitura de Pouso Alegre</a>
+    <a href="#cronograma">Cronograma</a>
+    <a href="#materias">Videoaulas</a>
+    <a href="#vagas">Vagas</a>
+  </div>
+  <p class="footer-copy">EDITAL Nº 01/2026 · MUNICÍPIO DE POUSO ALEGRE/MG · IBGP · 26 DE MARÇO DE 2026</p>
+</footer>
+
+<script>
+  // ── COUNTDOWN ──
+  function updateCountdown() {
+    const target = new Date('2026-07-26T09:15:00-03:00');
+    const now = new Date();
+    const diff = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('days').textContent = '00';
+      document.getElementById('hours').textContent = '00';
+      document.getElementById('minutes').textContent = '00';
+      document.getElementById('seconds').textContent = '00';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('days').textContent = String(days).padStart(2, '0');
+    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ── INTERSECTION OBSERVER ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // ── SMOOTH NAV ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
