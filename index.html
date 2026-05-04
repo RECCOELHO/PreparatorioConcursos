@@ -702,10 +702,16 @@
   .badge-both { background: rgba(26,107,138,0.15); color: #5BB8D4; border: 1px solid rgba(91,184,212,0.3); }
 
   /* ─── PROVA OBJETIVA DETAILS ─── */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 32px;
+  }
   .prova-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 32px;
+    min-width: 600px;
   }
 
   .prova-table th {
@@ -946,10 +952,14 @@
 
   /* ─── MOBILE ─── */
   @media (max-width: 768px) {
+    .impact-section { margin: 40px 20px; padding: 40px 20px; }
     .impact-content { flex-direction: column; text-align: center; gap: 30px; }
-    .impact-photo { width: 100%; max-width: 320px; height: 320px; }
-    .impact-text h2 { font-size: 32px; }
-    .impact-text p { font-size: 20px; }
+    .impact-photo { width: 100%; max-width: 280px; height: 280px; }
+    .impact-text h2 { font-size: 28px; }
+    .impact-text p { font-size: 18px; }
+    .couple-photos { gap: 16px; margin-bottom: 32px; }
+    .couple-photos img { width: 120px; height: 120px; border-width: 3px; }
+    .hero-title { font-size: 32px; word-break: break-word; }
     nav { padding: 0 20px; }
     .nav-links { display: none; }
     section { padding: 60px 20px; }
@@ -1225,7 +1235,8 @@
     <strong>📅 Data:</strong> 26 de julho de 2026 (domingo) — Início às 09h15 (Brasília) — Duração: 4 horas — Local: Pouso Alegre/MG
   </div>
 
-  <table class="prova-table fade-in">
+  <div class="table-responsive fade-in">
+  <table class="prova-table">
     <thead>
       <tr>
         <th>Parte</th>
@@ -1279,6 +1290,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
 </section>
 
 <hr class="section-divider">
