@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCM Pouso Alegre 2026 - Hub do Candidato</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gcm: {
+                            blue: '#0F172A', // Slate 900
+                            lightBlue: '#1E293B', // Slate 800
+                            gold: '#F59E0B', // Amber 500
+                            bg: '#F8FAFC' // Slate 50
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Required Placeholders -->
+    <!-- Chosen Palette: Slate Blue & Amber Gold (GCM Theme) -->
+    <!-- Application Structure Plan: A tabbed SPA dashboard allowing the candidate to seamlessly navigate between the Overview (stats), Edital Esquematizado (subjects + links), Plano de Estudos (interactive weekly cycle), and TAF (physical progression charts). This structure breaks down the dense Edital into actionable, trackable phases focused on practical preparation. -->
+    <!-- Visualization & Content Choices: 
+         1. Overview: Doughnut Chart (Chart.js) -> Shows weight of subjects. Goal: Inform priorities.
+         2. Subjects: Accordion/Grid text blocks -> Breaks down syllabus with direct external links. Goal: Organize.
+         3. Study Plan: Interactive Grid/Checkboxes -> Actionable weekly schedule. Goal: Change/Progress tracking.
+         4. TAF: Line Chart (Chart.js) -> Shows 8-week running progression. Goal: Visualize physical goals over time. 
+         Library/Method: Tailwind for layout, Chart.js for data visualization. Vanilla JS for tabs and state. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; }
+        
+        /* Chart Container Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        .tab-btn.active {
+            border-bottom: 2px solid #F59E0B;
+            color: #F59E0B;
+            font-weight: 600;
+        }
+        
+        .hide { display: none; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gcm-bg antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gcm-blue text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center py-6">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="bg-gcm-gold text-gcm-blue font-bold rounded-full h-12 w-12 flex items-center justify-center text-xl">
+                        🛡️
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight text-white">GCM Pouso Alegre 2026</h1>
+                        <p class="text-sm text-slate-300">Banca: IBGP | Lei 13.022/2014</p>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <div class="text-center px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
+                        <span class="block text-xs text-slate-400 uppercase tracking-wide">Status</span>
+                        <span class="font-semibold text-green-400">Edital Publicado</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex space-x-1 overflow-x-auto pb-2">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-3 text-sm font-medium text-slate-300 hover:text-white whitespace-nowrap transition-colors">
+                    📊 Visão Geral
+                </button>
+                <button onclick="switchTab('materias')" id="btn-materias" class="tab-btn px-4 py-3 text-sm font-medium text-slate-300 hover:text-white whitespace-nowrap transition-colors">
+                    📚 Prova & Questões
+                </button>
+                <button onclick="switchTab('plano')" id="btn-plano" class="tab-btn px-4 py-3 text-sm font-medium text-slate-300 hover:text-white whitespace-nowrap transition-colors">
+                    📅 Plano de Estudos
+                </button>
+                <button onclick="switchTab('taf')" id="btn-taf" class="tab-btn px-4 py-3 text-sm font-medium text-slate-300 hover:text-white whitespace-nowrap transition-colors">
+                    🏃 Treinamento TAF
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECTION: DASHBOARD -->
+        <section id="dashboard" class="fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gcm-blue mb-2">Resumo Estratégico</h2>
+                <p class="text-slate-600">Entenda a distribuição de pontos da prova objetiva para focar seus esforços onde mais importa.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Info Cards -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex items-center space-x-4">
+                    <div class="text-3xl">📝</div>
+                    <div>
+                        <p class="text-sm text-slate-500 font-medium">Total de Questões</p>
+                        <p class="text-2xl font-bold text-gcm-blue">50</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex items-center space-x-4">
+                    <div class="text-3xl">🎯</div>
+                    <div>
+                        <p class="text-sm text-slate-500 font-medium">Conhec. Específicos</p>
+                        <p class="text-2xl font-bold text-gcm-blue">Peso 2</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex items-center space-x-4">
+                    <div class="text-3xl">⚖️</div>
+                    <div>
+                        <p class="text-sm text-slate-500 font-medium">Nota Mínima Exigida</p>
+                        <p class="text-2xl font-bold text-gcm-blue">50%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-gcm-blue mb-4 text-center">Peso das Disciplinas na Prova</h3>
+                    <div class="chart-container">
+                        <canvas id="pesoChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-500 text-center">O gráfico mostra que Conhecimentos Específicos representam a maior fatia da sua nota final.</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
+                    <h3 class="text-lg font-bold text-gcm-blue mb-4">Dica de Preparação</h3>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✔️</span>
+                            <span><strong>Foco Total:</strong> Conhecimentos Específicos (Estatuto das Guardas, Constitucional, Penal). Eles definem sua aprovação.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✔️</span>
+                            <span><strong>Língua Portuguesa:</strong> É o critério de desempate e a segunda matéria mais importante.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✔️</span>
+                            <span><strong>Banca IBGP:</strong> Tem perfil literal (cobrança da "letra da lei") em direito e gramática normativa pesada em Português.</span>
+                        </li>
+                    </ul>
+                    <button onclick="switchTab('materias')" class="mt-6 w-full bg-gcm-gold text-gcm-blue font-bold py-3 rounded-lg hover:bg-yellow-400 transition-colors shadow-sm">
+                        Acessar Links das Aulas ➡️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: MATERIAS & LINKS -->
+        <section id="materias" class="hide fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gcm-blue mb-2">Edital Esquematizado & Material</h2>
+                <p class="text-slate-600">Explore o conteúdo programático. Utilize os botões para acessar aulas gratuitas no YouTube e baterias de questões filtradas.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Portugues -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-bl-lg">15 Questões</div>
+                    <h3 class="text-xl font-bold text-gcm-blue mb-3">Língua Portuguesa</h3>
+                    <p class="text-sm text-slate-600 mb-4 h-16 overflow-y-auto pr-2">Compreensão de textos, Ortografia, Acentuação, Morfologia, Sintaxe, Pontuação, Crase e Concordância.</p>
+                    <div class="flex space-x-2">
+                        <a href="https://www.youtube.com/watch?v=7E_8H4HaakQ" target="_blank" class="flex-1 text-center bg-red-50 text-red-600 font-semibold py-2 rounded border border-red-200 hover:bg-red-100 transition text-sm" title="Espaço Pedagógico - IBGP">
+                            ▶️ Aula IBGP
+                        </a>
+                        <a href="https://www.qconcursos.com/questoes-de-concursos/questoes?discipline_ids[]=1&institution_ids[]=240" target="_blank" class="flex-1 text-center bg-blue-50 text-blue-600 font-semibold py-2 rounded border border-blue-200 hover:bg-blue-100 transition text-sm">
+                            📝 Questões
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Conhecimentos Específicos -->
+                <div class="bg-white rounded-xl shadow-sm border border-gcm-gold p-6 relative overflow-hidden ring-1 ring-gcm-gold">
+                    <div class="absolute top-0 right-0 bg-gcm-gold text-gcm-blue text-xs font-bold px-3 py-1 rounded-bl-lg">25 Questões (Peso 2)</div>
+                    <h3 class="text-xl font-bold text-gcm-blue mb-3">Conhecimentos Específicos</h3>
+                    <p class="text-sm text-slate-600 mb-4 h-16 overflow-y-auto pr-2">Constituição Federal (Art. 5º e 144), Código Penal (Crimes contra Pessoa/Patrimônio/Adm. Pública), Lei 13.022/14 (Estatuto das Guardas), ECA, Maria da Penha.</p>
+                    <div class="flex space-x-2">
+                        <a href="https://www.youtube.com/watch?v=CmrePVnt93U" target="_blank" class="flex-1 text-center bg-red-50 text-red-600 font-semibold py-2 rounded border border-red-200 hover:bg-red-100 transition text-sm" title="NB Concursos - Lei GCM Pouso Alegre">
+                            ▶️ Aula Específica
+                        </a>
+                        <a href="https://www.qconcursos.com/questoes-de-concursos/questoes?q=Lei+13022" target="_blank" class="flex-1 text-center bg-blue-50 text-blue-600 font-semibold py-2 rounded border border-blue-200 hover:bg-blue-100 transition text-sm">
+                            📝 Questões
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Raciocinio Logico -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-bl-lg">5 Questões</div>
+                    <h3 class="text-xl font-bold text-gcm-blue mb-3">Raciocínio Lógico</h3>
+                    <p class="text-sm text-slate-600 mb-4 h-16 overflow-y-auto pr-2">Proposições, Conectivos, Tabelas-verdade, Equivalências lógicas, Diagramas lógicos e Resolução de problemas.</p>
+                    <div class="flex space-x-2">
+                        <a href="https://www.youtube.com/results?search_query=raciocinio+logico+ibgp" target="_blank" class="flex-1 text-center bg-red-50 text-red-600 font-semibold py-2 rounded border border-red-200 hover:bg-red-100 transition text-sm">
+                            ▶️ Aulas YT
+                        </a>
+                        <a href="https://www.qconcursos.com/questoes-de-concursos/questoes?discipline_ids[]=2&institution_ids[]=240" target="_blank" class="flex-1 text-center bg-blue-50 text-blue-600 font-semibold py-2 rounded border border-blue-200 hover:bg-blue-100 transition text-sm">
+                            📝 Questões
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Informatica -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-bl-lg">5 Questões</div>
+                    <h3 class="text-xl font-bold text-gcm-blue mb-3">Informática Básica</h3>
+                    <p class="text-sm text-slate-600 mb-4 h-16 overflow-y-auto pr-2">Windows 10/11, Word, Excel, Internet, Segurança da Informação, Atalhos de teclado.</p>
+                    <div class="flex space-x-2">
+                        <a href="https://www.youtube.com/watch?v=swAM85Vw76g" target="_blank" class="flex-1 text-center bg-red-50 text-red-600 font-semibold py-2 rounded border border-red-200 hover:bg-red-100 transition text-sm" title="Veon Concursos - IBGP Office">
+                            ▶️ Aula IBGP
+                        </a>
+                        <a href="https://www.qconcursos.com/questoes-de-concursos/questoes?discipline_ids[]=6&institution_ids[]=240" target="_blank" class="flex-1 text-center bg-blue-50 text-blue-600 font-semibold py-2 rounded border border-blue-200 hover:bg-blue-100 transition text-sm">
+                            📝 Questões
+                        </a>
+                    </div>
+                </div>
+
+                <!-- História e Geografia de Pouso Alegre -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative overflow-hidden md:col-span-2">
+                    <div class="absolute top-0 right-0 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-bl-lg">5 Questões</div>
+                    <h3 class="text-xl font-bold text-gcm-blue mb-3">História e Geografia de Pouso Alegre</h3>
+                    <p class="text-sm text-slate-600 mb-4 h-16 overflow-y-auto pr-2">Gênese em 1789 (Senhor Bom Jesus), Freguesia em 1810, expansão com a Rede Sul-Mineira em 1895. Foco em demografia atual e infraestrutura logística.</p>
+                    <div class="flex space-x-2">
+                        <a href="https://pousoalegre.mg.gov.br/" target="_blank" class="flex-1 text-center bg-green-50 text-green-600 font-semibold py-2 rounded border border-green-200 hover:bg-green-100 transition text-sm">
+                            🌐 Portal da Prefeitura
+                        </a>
+                        <a href="https://www.qconcursos.com/questoes-de-concursos/questoes?discipline_ids[]=74" target="_blank" class="flex-1 text-center bg-blue-50 text-blue-600 font-semibold py-2 rounded border border-blue-200 hover:bg-blue-100 transition text-sm">
+                            📝 Questões
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: PLANO DE ESTUDOS -->
+        <section id="plano" class="hide fade-in">
+            <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gcm-blue mb-2">Ciclo Semanal de Estudos</h2>
+                    <p class="text-slate-600">Marque os blocos concluídos. A rotina intercala teoria, revisão e resolução de questões.</p>
+                </div>
+                <button onclick="resetCycle()" class="mt-4 md:mt-0 px-4 py-2 bg-slate-200 text-slate-700 font-medium rounded hover:bg-slate-300 transition text-sm">
+                    🔄 Reiniciar Ciclo
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-slate-200">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                            <th class="p-4 border-b">Dia</th>
+                            <th class="p-4 border-b">Bloco 1 (Teoria / 1h)</th>
+                            <th class="p-4 border-b">Bloco 2 (Teoria / 1h)</th>
+                            <th class="p-4 border-b">Bloco 3 (Questões / 30m)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="study-table-body" class="text-sm">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-100">
+                <strong>💡 Dica:</strong> Estudar por ciclos (alternando matérias) ajuda na fixação de longo prazo. Não estude apenas uma matéria o dia todo.
+            </div>
+        </section>
+
+        <!-- SECTION: TAF -->
+        <section id="taf" class="hide fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gcm-blue mb-2">Treinamento Físico (TAF)</h2>
+                <p class="text-slate-600">O Teste de Aptidão Física reprova quase 30% dos candidatos. Comece seu treinamento hoje.</p>
+            </div>
+
+            <!-- TAF Tabs (Male/Female) -->
+            <div class="flex space-x-2 mb-6">
+                <button onclick="setTafGender('masculino')" id="btn-taf-masc" class="px-6 py-2 bg-gcm-blue text-white font-medium rounded-lg shadow">Masculino</button>
+                <button onclick="setTafGender('feminino')" id="btn-taf-fem" class="px-6 py-2 bg-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-300">Feminino</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Targets Card -->
+                <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-gcm-blue mb-4">Metas do Edital</h3>
+                    <ul id="taf-targets" class="space-y-4">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Chart Card -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-gcm-blue mb-4 text-center">Progressão 8 Semanas: Corrida 12 Minutos</h3>
+                    <div class="chart-container">
+                        <canvas id="tafChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Training Tips -->
+            <div class="bg-gcm-blue text-white rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
+                <h3 class="text-xl font-bold mb-3 flex items-center">
+                    <span class="mr-2">⚠️</span> Dicas Cruciais para o TAF
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
+                    <p><strong>Barra Fixa:</strong> Se não faz nenhuma, comece com barra isométrica (segurar no topo) e fase excêntrica (descer devagar).</p>
+                    <p><strong>Corrida:</strong> Não corra todos os dias. Alterne treinos de tiro (intervalados) com rodagem leve. Descanse as articulações.</p>
+                    <p><strong>Execução:</strong> Assista vídeos no YouTube sobre a <em>execução correta</em>. Cotovelo não esticado na flexão não conta!</p>
+                    <p><strong>Simulado:</strong> A cada 15 dias, faça um simulado completo nas mesmas condições do edital (sequência de exercícios).</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-100 border-t border-slate-200 mt-auto py-6 text-center text-slate-500 text-sm">
+        <p>Desenvolvido para auxílio de estudo - Baseado em padrões da Banca IBGP.</p>
+    </footer>
+
+    <!-- Javascript Logic -->
+    <script>
+        // --- State Management ---
+        const state = {
+            currentTab: 'dashboard',
+            tafGender: 'masculino',
+            studyCycle: JSON.parse(localStorage.getItem('gcmStudyCycle')) || {
+                'dia-1-b1': false, 'dia-1-b2': false, 'dia-1-b3': false,
+                'dia-2-b1': false, 'dia-2-b2': false, 'dia-2-b3': false,
+                'dia-3-b1': false, 'dia-3-b2': false, 'dia-3-b3': false,
+                'dia-4-b1': false, 'dia-4-b2': false, 'dia-4-b3': false,
+                'dia-5-b1': false, 'dia-5-b2': false, 'dia-5-b3': false,
+                'dia-6-b1': false, 'dia-6-b2': false, 'dia-6-b3': false,
+                'dia-7-b1': false, 'dia-7-b2': false, 'dia-7-b3': false,
+            }
+        };
+
+        // --- Data Definitions ---
+        const studyPlanData = [
+            { day: "Segunda", b1: "Língua Portuguesa", b2: "Estatuto das Guardas", b3: "Questões: Português" },
+            { day: "Terça", b1: "Constitucional", b2: "Raciocínio Lógico", b3: "Questões: Direito" },
+            { day: "Quarta", b1: "Código Penal", b2: "Informática", b3: "Questões: Informática/RLM" },
+            { day: "Quinta", b1: "Maria da Penha / ECA", b2: "Língua Portuguesa", b3: "Questões: Específicos" },
+            { day: "Sexta", b1: "Estatuto das Guardas", b2: "Constitucional", b3: "Revisão Semanal" },
+            { day: "Sábado", b1: "Simulado (Metade)", b2: "Correção Simulado", b3: "TAF Treino Leve" },
+            { day: "Domingo", b1: "Descanso / Leitura de Lei Seca", b2: "-", b3: "-" }
+        ];
+
+        const tafData = {
+            masculino: {
+                targets: [
+                    { icon: '💪', name: 'Barra Fixa', goal: 'Mínimo 3 repetições' },
+                    { icon: '🏋️', name: 'Flexão de Braço', goal: 'Mínimo 25 repetições' },
+                    { icon: '🤸', name: 'Abdominal', goal: 'Mínimo 35 repetições (1 min)' },
+                    { icon: '🏃', name: 'Corrida 12 min', goal: 'Mínimo 2.400 metros' }
+                ],
+                chartData: [1600, 1800, 1950, 2100, 2200, 2300, 2400, 2550]
+            },
+            feminino: {
+                targets: [
+                    { icon: '💪', name: 'Barra Fixa (Isometria)', goal: 'Mínimo 10 segundos' },
+                    { icon: '🏋️', name: 'Flexão (Apoio Joelhos)', goal: 'Mínimo 15 repetições' },
+                    { icon: '🤸', name: 'Abdominal', goal: 'Mínimo 30 repetições (1 min)' },
+                    { icon: '🏃', name: 'Corrida 12 min', goal: 'Mínimo 2.000 metros' }
+                ],
+                chartData: [1200, 1400, 1550, 1700, 1850, 1950, 2050, 2200]
+            }
+        };
+
+        let chartInstances = {};
+
+        // --- Core Interactions & Navigation ---
+        function switchTab(tabId) {
+            // Update UI
+            document.querySelectorAll('section').forEach(el => el.classList.add('hide'));
+            document.getElementById(tabId).classList.remove('hide');
+            
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active', 'border-b-2', 'border-gcm-gold', 'text-gcm-gold');
+                el.classList.add('text-slate-300');
+            });
+            
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.remove('text-slate-300');
+            activeBtn.classList.add('active', 'border-b-2', 'border-gcm-gold', 'text-gcm-gold');
+
+            state.currentTab = tabId;
+
+            // Trigger specific renders
+            if (tabId === 'dashboard') renderDashboardChart();
+            if (tabId === 'taf') renderTafView();
+        }
+
+        // --- Render Functions ---
+
+        function renderStudyTable() {
+            const tbody = document.getElementById('study-table-body');
+            tbody.innerHTML = '';
+            
+            studyPlanData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition";
+                
+                const dayNum = index + 1;
+                
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-gcm-blue">${row.day}</td>
+                    ${renderStudyCell(row.b1, dayNum, 1)}
+                    ${renderStudyCell(row.b2, dayNum, 2)}
+                    ${renderStudyCell(row.b3, dayNum, 3)}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderStudyCell(text, day, block) {
+            if (text === "-") return `<td class="p-4 text-slate-400">-</td>`;
+            const id = `dia-${day}-b${block}`;
+            const isChecked = state.studyCycle[id] ? 'checked' : '';
+            const textClass = state.studyCycle[id] ? 'line-through text-slate-400' : 'text-slate-700';
+            
+            return `
+                <td class="p-4">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="${id}" ${isChecked} onchange="toggleStudyItem('${id}')" 
+                               class="rounded border-slate-300 text-gcm-gold focus:ring-gcm-gold w-4 h-4">
+                        <span id="label-${id}" class="${textClass}">${text}</span>
+                    </label>
+                </td>
+            `;
+        }
+
+        function toggleStudyItem(id) {
+            const checkbox = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            
+            state.studyCycle[id] = checkbox.checked;
+            localStorage.setItem('gcmStudyCycle', JSON.stringify(state.studyCycle));
+            
+            if (checkbox.checked) {
+                label.classList.add('line-through', 'text-slate-400');
+                label.classList.remove('text-slate-700');
+            } else {
+                label.classList.remove('line-through', 'text-slate-400');
+                label.classList.add('text-slate-700');
+            }
+        }
+
+        function resetCycle() {
+            if(confirm("Deseja realmente apagar todo o progresso da semana?")) {
+                for(let key in state.studyCycle) { state.studyCycle[key] = false; }
+                localStorage.setItem('gcmStudyCycle', JSON.stringify(state.studyCycle));
+                renderStudyTable();
+            }
+        }
+
+        function renderDashboardChart() {
+            const ctx = document.getElementById('pesoChart').getContext('2d');
+            
+            if (chartInstances.dashboard) {
+                chartInstances.dashboard.destroy();
+            }
+
+            chartInstances.dashboard = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Conhec. Específicos', 'Língua Portuguesa', 'Informática', 'Raciocínio Lógico'],
+                    datasets: [{
+                        data: [50, 15, 5, 5], // Points: Específicos (25*2), others (1*x)
+                        backgroundColor: [
+                            '#0F172A', // Slate 900
+                            '#F59E0B', // Amber 500
+                            '#64748B', // Slate 500
+                            '#CBD5E1'  // Slate 300
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw} Pontos`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function setTafGender(gender) {
+            state.tafGender = gender;
+            
+            // UI Toggle
+            document.getElementById('btn-taf-masc').className = gender === 'masculino' ? 
+                'px-6 py-2 bg-gcm-blue text-white font-medium rounded-lg shadow' : 
+                'px-6 py-2 bg-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-300';
+                
+            document.getElementById('btn-taf-fem').className = gender === 'feminino' ? 
+                'px-6 py-2 bg-gcm-blue text-white font-medium rounded-lg shadow' : 
+                'px-6 py-2 bg-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-300';
+
+            renderTafView();
+        }
+
+        function renderTafView() {
+            const data = tafData[state.tafGender];
+            
+            // Render Targets List
+            const ul = document.getElementById('taf-targets');
+            ul.innerHTML = '';
+            data.targets.forEach(t => {
+                ul.innerHTML += `
+                    <li class="flex items-center border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                        <div class="text-2xl mr-4 bg-slate-100 p-2 rounded-lg">${t.icon}</div>
+                        <div>
+                            <p class="font-bold text-slate-800">${t.name}</p>
+                            <p class="text-sm text-gcm-gold font-semibold">${t.goal}</p>
+                        </div>
+                    </li>
+                `;
+            });
+
+            // Render Chart
+            const ctx = document.getElementById('tafChart').getContext('2d');
+            
+            if (chartInstances.taf) {
+                chartInstances.taf.destroy();
+            }
+
+            const targetLine = state.tafGender === 'masculino' ? 2400 : 2000;
+
+            chartInstances.taf = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'],
+                    datasets: [
+                        {
+                            label: 'Evolução Sugerida (Metros)',
+                            data: data.chartData,
+                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#0F172A',
+                            pointRadius: 4,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Meta Edital',
+                            data: Array(8).fill(targetLine),
+                            borderColor: '#10B981', // Green
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: false,
+                            min: targetLine - 1000,
+                            title: { display: true, text: 'Distância (m)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudyTable();
+            renderDashboardChart(); // Initialize default chart
+        });
+
+    </script>
+</body>
+</html>
