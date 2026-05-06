@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudos PEP — SPDATA SGH® Versão 25</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #f0f2f5;
+    --border: #e0e4eb;
+    --text: #1a1d23;
+    --text2: #5a6070;
+    --text3: #9aa0ad;
+    --accent: #185FA5;
+    --accent-bg: #e8f0fb;
+    --accent-text: #0c447c;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+  .app { display: flex; height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 230px; min-width: 230px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon i { color: white; font-size: 20px; }
+  .logo-text { font-size: 13px; font-weight: 600; color: var(--text); }
+  .logo-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+  .nav-section-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--text3); padding: 12px 16px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 16px; font-size: 13px;
+    cursor: pointer; color: var(--text2);
+    border-left: 2px solid transparent;
+    transition: background 0.12s, color 0.12s;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active {
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    border-left-color: var(--accent);
+    font-weight: 600;
+  }
+  .nav-item i { font-size: 16px; flex-shrink: 0; }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; }
+  .content-wrap { padding: 24px; max-width: 780px; }
+
+  .page-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  }
+  .back-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .back-btn:hover { background: var(--surface2); }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text); }
+  .page-badge {
+    font-size: 11px; padding: 3px 10px;
+    background: var(--accent-bg); color: var(--accent-text);
+    border-radius: 20px; font-weight: 600;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 16px; cursor: pointer;
+    user-select: none;
+  }
+  .card-header:hover { background: var(--surface2); }
+  .card-header-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent-bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-header-icon i { font-size: 17px; color: var(--accent); }
+  .card-header-title { font-size: 13.5px; font-weight: 600; color: var(--text); flex: 1; }
+  .chevron { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .card-body { padding: 0 16px 14px; }
+  .key-point {
+    display: flex; gap: 9px; align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--text2); line-height: 1.55;
+  }
+  .key-point:last-of-type { border-bottom: none; }
+  .kp-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); margin-top: 6px; flex-shrink: 0;
+  }
+
+  .tip-box {
+    margin-top: 10px;
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: var(--radius-sm);
+    padding: 10px 13px; font-size: 12.5px; color: #92400e;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .tip-box i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* MODULE GRID */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px; margin-bottom: 16px;
+  }
+  .module-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .module-card:hover { border-color: var(--accent); background: var(--accent-bg); }
+  .mc-icon { font-size: 26px; color: var(--accent); margin-bottom: 10px; }
+  .mc-name { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .mc-desc { font-size: 12px; color: var(--text2); line-height: 1.45; }
+
+  .cta-card {
+    background: var(--accent-bg);
+    border: 1px solid #b8d4f0;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .cta-card i { font-size: 24px; color: var(--accent); flex-shrink: 0; }
+  .cta-card .cta-title { font-size: 13.5px; font-weight: 600; color: var(--accent-text); margin-bottom: 3px; }
+  .cta-card .cta-desc { font-size: 12px; color: var(--accent-text); opacity: 0.85; }
+  .cta-btn {
+    margin-left: auto; white-space: nowrap;
+    padding: 8px 16px; background: var(--accent);
+    color: white; border: none; border-radius: var(--radius-sm);
+    font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+  .cta-btn:hover { background: #0c447c; }
+
+  /* CHAT */
+  .chat-area { display: flex; flex-direction: column; height: 100vh; }
+  .chat-topbar {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+  }
+  .chat-topbar .ct-title { font-size: 15px; font-weight: 600; }
+  .clear-btn {
+    margin-left: auto; font-size: 12px; padding: 5px 12px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer; color: var(--text2);
+  }
+  .clear-btn:hover { background: var(--surface2); }
+
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+  .chat-empty {
+    text-align: center; padding: 48px 20px;
+  }
+  .chat-empty i { font-size: 48px; color: var(--text3); }
+  .chat-empty .ce-title { font-size: 15px; font-weight: 600; color: var(--text); margin: 12px 0 6px; }
+  .chat-empty .ce-desc { font-size: 13px; color: var(--text2); line-height: 1.6; max-width: 340px; margin: 0 auto; }
+
+  .chips-area { padding: 0 20px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 12px; padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface); color: var(--text2);
+    cursor: pointer; transition: all 0.12s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-bg); }
+
+  .msg { margin-bottom: 14px; }
+  .msg-user { display: flex; justify-content: flex-end; }
+  .msg-ai { display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; }
+  .ai-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ai-avatar i { font-size: 15px; color: white; }
+  .bubble {
+    max-width: 82%; padding: 10px 14px;
+    border-radius: 14px; font-size: 13.5px; line-height: 1.65;
+  }
+  .msg-user .bubble {
+    background: var(--accent); color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg-ai .bubble {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); border-bottom-left-radius: 4px;
+  }
+  .bubble-wrap { display: flex; flex-direction: column; align-items: flex-start; }
+  .bubble-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; padding-left: 2px; }
+
+  .typing { display: flex; align-items: center; gap: 5px; padding: 4px 2px; }
+  .typing span {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text3); animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  .chat-input-area {
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; gap: 8px;
+  }
+  .chat-input-area textarea {
+    flex: 1; resize: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 13px; font-size: 13.5px;
+    font-family: inherit; min-height: 42px; max-height: 120px;
+    outline: none; color: var(--text); background: var(--surface);
+    transition: border-color 0.12s;
+  }
+  .chat-input-area textarea:focus { border-color: var(--accent); }
+  .send-btn {
+    width: 42px; height: 42px; border-radius: var(--radius);
+    background: var(--accent); color: white;
+    border: none; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0; transition: background 0.12s;
+  }
+  .send-btn:hover { background: #0c447c; }
+  .send-btn:disabled { background: var(--surface2); color: var(--text3); cursor: not-allowed; }
+
+  .bottom-hint {
+    margin-top: 12px; padding: 12px 16px;
+    background: var(--surface2); border-radius: var(--radius-sm);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .bottom-hint i { font-size: 18px; color: var(--text3); }
+  .bottom-hint span { font-size: 12.5px; color: var(--text2); }
+  .bottom-hint button {
+    margin-left: auto; font-size: 12px; padding: 6px 12px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer; color: var(--text2);
+    white-space: nowrap;
+  }
+  .bottom-hint button:hover { background: var(--surface); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><i class="ti ti-hospital"></i></div>
+      <div>
+        <div class="logo-text">PEP Hospital Geral</div>
+        <div class="logo-sub">SPDATA SGH® Versão 25</div>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Estudo</div>
+    <div class="nav-item active" id="nav-overview" onclick="navigate('overview')">
+      <i class="ti ti-layout-grid"></i> Visão Geral
+    </div>
+    <div class="nav-item" id="nav-chat" onclick="navigate('chat')">
+      <i class="ti ti-message-circle"></i> Assistente IA
+    </div>
+
+    <div class="nav-section-label">Módulos</div>
+    <div class="nav-item" id="nav-permissoes" onclick="navigate('permissoes')"><i class="ti ti-shield-check"></i> Permissões</div>
+    <div class="nav-item" id="nav-parametros" onclick="navigate('parametros')"><i class="ti ti-settings"></i> Parametrização</div>
+    <div class="nav-item" id="nav-prescricao" onclick="navigate('prescricao')"><i class="ti ti-pill"></i> Prescrição</div>
+    <div class="nav-item" id="nav-enfermagem" onclick="navigate('enfermagem')"><i class="ti ti-stethoscope"></i> Enfermagem</div>
+    <div class="nav-item" id="nav-exames" onclick="navigate('exames')"><i class="ti ti-microscope"></i> Exames</div>
+    <div class="nav-item" id="nav-templates" onclick="navigate('templates')"><i class="ti ti-file-text"></i> Templates / Anamnese</div>
+    <div class="nav-item" id="nav-assinatura" onclick="navigate('assinatura')"><i class="ti ti-signature"></i> Assinatura Digital</div>
+    <div class="nav-item" id="nav-alta" onclick="navigate('alta')"><i class="ti ti-logout"></i> Alta / Encerramento</div>
+    <div class="nav-item" id="nav-especiais" onclick="navigate('especiais')"><i class="ti ti-sparkles"></i> Rotinas Especiais</div>
+  </aside>
+
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+const CONTENT = {
+  overview: {
+    title: "Visão Geral — PEP Hospital Geral",
+    badge: "700 páginas · 59 capítulos",
+    modules: [
+      { icon: "ti-shield-check", name: "Permissões & Acesso", desc: "CBO, grupos e configuração de usuários", nav: "permissoes" },
+      { icon: "ti-settings", name: "Parametrização", desc: "Parâmetros gerais, integrações e impressão", nav: "parametros" },
+      { icon: "ti-pill", name: "Prescrição Geral", desc: "Medicamentos, soluções, dietas e procedimentos", nav: "prescricao" },
+      { icon: "ti-stethoscope", name: "Checagem de Enfermagem", desc: "Aprazamento, balanço hídrico e código de barras", nav: "enfermagem" },
+      { icon: "ti-microscope", name: "Exames", desc: "Solicitação, visualização e acompanhamento", nav: "exames" },
+      { icon: "ti-file-text", name: "Templates / Anamnese", desc: "Criação de modelos, evolução e diagnóstico", nav: "templates" },
+      { icon: "ti-signature", name: "Assinatura Digital", desc: "A1, A3, SafeWeb e Valid", nav: "assinatura" },
+      { icon: "ti-logout", name: "Alta do Paciente", desc: "Provisionar, alta médica e hospitalar", nav: "alta" },
+      { icon: "ti-sparkles", name: "Rotinas Especiais", desc: "Oncologia, oftalmologia, AIH, APAC e mais", nav: "especiais" },
+    ]
+  },
+  permissoes: {
+    title: "Permissões e Acesso",
+    badge: "Cap. 2",
+    sections: [
+      { icon: "ti-key", title: "Requisitos mínimos de acesso",
+        points: ["Dois requisitos obrigatórios: permissão do grupo ao módulo PEP e cadastro/vinculação do CBO ao usuário.","Permissões configuradas em: SGH > Permissões > P.E.P > Selecione o grupo.","As permissões devem refletir quais atividades aquele grupo de usuários executa no sistema."],
+        tip: "Cada grupo pode ter permissões distintas — planeje com cuidado antes de liberar acessos." },
+      { icon: "ti-user-check", title: "Cadastro de CBO (Profissional)",
+        points: ["Caminho: SGH > Tabelas > Profissionais > Gerenciamento.","Dados obrigatórios: Nome, CPF, CBO, competência, UF, conselho profissional e número do conselho.","O profissional deve estar com status 'Ativo'.","Após cadastrar o CBO, vincule-o ao usuário do sistema."],
+        tip: null },
+      { icon: "ti-link", title: "Vinculação CBO ao usuário",
+        points: ["Caminho: SGH > Usuários.","Selecione o usuário desejado.","Em Manutenção de Papéis, coloque a opção 4 – Operador do Sistema.","Vincule o CBO previamente cadastrado e clique em Gravar."],
+        tip: "Sem essa vinculação, o usuário não consegue acesso ao PEP mesmo com permissão de grupo ativa." },
+      { icon: "ti-lock", title: "Restrição de acesso ao prontuário",
+        points: ["É possível restringir o acesso ao prontuário de determinados pacientes (rotina de privacidade).","Profissionais com acesso irrestrito emergencial podem ser configurados nos parâmetros.","O parâmetro 'Permitir registro de consentimento de acesso' deve estar ativo para essa funcionalidade."],
+        tip: null }
+    ]
+  },
+  parametros: {
+    title: "Parametrização do Módulo PEP",
+    badge: "Cap. 3",
+    sections: [
+      { icon: "ti-adjustments", title: "Parâmetros Gerais — Parâmetros I",
+        points: ["Controlar checagem de enfermagem: itens checados vão para o Balanço Hídrico automaticamente.","Checar somente itens assinados: permite checar apenas prescrições com assinatura digital.","Realizar aprazamento pela enfermagem: ativa o aprazamento em todos os setores (não é possível ativar só em setores específicos).","Tolerância para lançamento atrasado: define limite de tempo para lançar dados retroativos sem justificativa (máx. 2h).","Validar duplicidade: detecta quando o mesmo medicamento ou princípio ativo é prescrito mais de uma vez.","Alertar previsão de alta: notifica ao abrir o prontuário do paciente."],
+        tip: "Sempre clique em 'Confirmar' após qualquer alteração nos Parâmetros." },
+      { icon: "ti-link", title: "Integrações com Estoque",
+        points: ["Dois tipos de dispensação: requisição de saída (ao finalizar prescrição) ou dispensação por horário.","Validar antimicrobiano: ativa a rotina que exige informações adicionais ao prescrever ATB.","Gerar devolução: devolve automaticamente itens não marcados como administrados na checagem.","Item não padronizado: deve ser configurado um item base para que a requisição seja gerada corretamente."],
+        tip: null },
+      { icon: "ti-printer", title: "Parâmetros de Impressão",
+        points: ["Logotipo do hospital: inserido aqui para aparecer no cabeçalho da Prescrição Geral.","Imprimir horários: define se os horários de administração aparecem na impressão.","Modelo de impressão: 'Padrão completo' ou 'Resumido sem horários'.","Imprimir prescrição frente e verso: requer impressora com suporte a duplex.","Qtde de profissionais de enfermagem: número de espaços para assinatura no rodapé."],
+        tip: null },
+      { icon: "ti-mail", title: "Notificações por E-mail",
+        points: ["E-mails configurados para: notificação compulsória, acesso emergencial a prontuário restrito, erros de assinatura eletrônica e planejamento oncológico.","Requer configuração do servidor SMTP (endereço, porta, SSL, usuário e senha).","É possível testar o envio pelo botão 'Testar Envio'."],
+        tip: null }
+    ]
+  },
+  prescricao: {
+    title: "Prescrição Geral",
+    badge: "Cap. 5",
+    sections: [
+      { icon: "ti-pill", title: "Tipos de itens prescritíveis",
+        points: ["Medicamentos: com dose, frequência, via de acesso e duração.","Soluções EV: componentes, diluentes, velocidade de infusão.","Procedimentos clínicos: cadastrados previamente em SGH > Tabelas.","Dietas: livre, oral, enteral, parenteral e jejum — cada uma com campos específicos.","Hemocomponentes: com unidades de prescrição configuradas nos parâmetros.","Respiração espontânea e nível de atividade/fisioterapia."],
+        tip: "A velocidade de infusão pode ser obrigatória ou calculada automaticamente conforme parametrização." },
+      { icon: "ti-clock", title: "Frequências e horários",
+        points: ["Itens com intervalo superior a 24h precisam de configuração especial (Ex: dose semanal).","A frequência '24/24h' foi adicionada na V.01/26 para representar administração diária contínua.","Horários relativos podem ser configurados com horas específicas via Esquema de Horário de Prescrição.","Itens 'Se necessário' (S/N) e 'A critério médico' (ACM) geram requisição no ato ou na checagem."],
+        tip: null },
+      { icon: "ti-copy", title: "Protocolos e kits",
+        points: ["É possível criar protocolos padrão de prescrição geral para reutilização.","Kits de medicamentos e kits de soluções EV contínua podem ser configurados.","Ao prescrever um item com kit cadastrado, ele pode ser puxado automaticamente."],
+        tip: null },
+      { icon: "ti-alert-circle", title: "Alertas e validações",
+        points: ["Duplicidade de medicamentos: alerta ou bloqueia ao prescrever o mesmo item ou princípio ativo.","Alergia CBARA: integração com rotina de alergia para validar prescrição.","Antimicrobiano: exige informações adicionais (diagnóstico, cultura, etc.) quando configurado.","Índice prognóstico: pode ser exigido antes de iniciar uma prescrição."],
+        tip: "A validação de duplicidade pode ser configurada por item ou por princípio ativo." }
+    ]
+  },
+  enfermagem: {
+    title: "Checagem de Enfermagem",
+    badge: "Cap. 8, 11",
+    sections: [
+      { icon: "ti-check", title: "Aprazamento de enfermagem",
+        points: ["Ativado pelo parâmetro 'Realizar aprazamento pela enfermagem'.","A enfermagem define os horários de administração após a prescrição médica.","O aprazamento não pode ser configurado apenas para setores específicos — ativa para todos."],
+        tip: null },
+      { icon: "ti-barcode", title: "Checagem com código de barras (V.02/25)",
+        points: ["Implementada na V.02/25 — eleva a segurança assistencial.","Integra validação automatizada por código de barras com rastreabilidade em tempo real.","Registro direto no prontuário eletrônico no momento da administração.","Alinhada às boas práticas de administração medicamentosa."],
+        tip: "A rastreabilidade por código de barras ajuda a reduzir erros de medicação." },
+      { icon: "ti-droplet", title: "Balanço hídrico",
+        points: ["Registra entradas e saídas do paciente (infusões, eliminações, diureses etc.).","Itens checados vão automaticamente para o Balanço Hídrico (se parâmetro ativo).","Horários de fechamento do Balanço Hídrico são configuráveis.","É possível cadastrar itens de eliminação e seus aspectos."],
+        tip: null }
+    ]
+  },
+  exames: {
+    title: "Solicitação e Visualização de Exames",
+    badge: "Cap. 12",
+    sections: [
+      { icon: "ti-flask", title: "Cadastro e configuração",
+        points: ["Exames cadastrados em SGH > Tabelas com bateria, local de realização e responsável por laudo.","Kits de exames permitem solicitar grupos de exames de uma só vez.","O modelo de impressão da solicitação é vinculado via Gerador de Relatórios.","Assinatura digital pode ser adicionada à solicitação de exames."],
+        tip: null },
+      { icon: "ti-search", title: "Fluxo de solicitação",
+        points: ["Médico solicita exame dentro do prontuário do paciente.","O sistema agrupa por bateria no histórico de solicitação (se parâmetro ativo).","Exames fora da instituição podem vir marcados automaticamente.","É possível acompanhar o status dos exames após solicitação."],
+        tip: null },
+      { icon: "ti-eye", title: "Resultados e laudos",
+        points: ["Resultados liberados ficam visíveis dentro do prontuário.","Integração com laboratórios terceiros disponível via Web Service (padrão SGH).","Alerta de exames liberados pode ser configurado com tempo de validação personalizado."],
+        tip: "O parâmetro 'Alerta exames liberados' avisa o profissional quando há resultados disponíveis." }
+    ]
+  },
+  templates: {
+    title: "Templates, Anamnese e Evolução",
+    badge: "Cap. 16, 17",
+    sections: [
+      { icon: "ti-template", title: "Criação de templates",
+        points: ["Templates são formulários configuráveis com perguntas de vários tipos.","Tipos de pergunta: texto livre, CID10, múltiplos CIDs, procedimentos, lista de problemas e mais.","Suportam fórmulas (Expression enabled / Expression value) para cálculos automáticos.","Templates de Anamnese, Evolução e Diagnóstico são criados e configurados nessa rotina."],
+        tip: null },
+      { icon: "ti-notes", title: "Anamnese",
+        points: ["Pode ser configurada para abertura automática ao selecionar o paciente.","Pode ser exigida antes da prescrição (parâmetro 'Composição de Evoluções/Diagnósticos – Ficha de admissão').","Perguntas pendentes são sinalizadas para o profissional."],
+        tip: null },
+      { icon: "ti-activity", title: "Evolução e Diagnóstico",
+        points: ["Evolução registra o acompanhamento clínico do paciente ao longo da internação.","Diagnóstico registra os CIDs do paciente com suporte a múltiplos diagnósticos.","Resumo clínico pode ser aberto automaticamente ao acessar o prontuário.","Restrição de CID por sexo: alertar, bloquear ou exigir justificativa."],
+        tip: null }
+    ]
+  },
+  assinatura: {
+    title: "Assinatura Digital",
+    badge: "Cap. 52, 56",
+    sections: [
+      { icon: "ti-certificate", title: "Tipos de assinatura suportados",
+        points: ["A1: certificado em arquivo no computador ou pen-drive.","A3: dispositivo físico (token, smartcard).","SafeWeb: assinatura em nuvem via plataforma SafeWeb.","Valid: assinatura em nuvem via plataforma Valid."],
+        tip: null },
+      { icon: "ti-settings", title: "Configuração da assinatura",
+        points: ["Parâmetro 'Assinar digitalmente os documentos clínicos' ativa a solicitação para todos os usuários.","Habilitação por usuário: permite ativar apenas para usuários específicos.","Assinatura em lote: usuário acumula pendências e assina tudo de uma vez.","Pendências de assinatura podem abrir automaticamente ao iniciar o PEP."],
+        tip: null },
+      { icon: "ti-user-circle", title: "Assinatura digital do paciente",
+        points: ["Permite que o próprio paciente assine documentos digitalmente (termos de consentimento, etc.).","Requer cadastro do paciente com e-mail e CPF.","O paciente recebe link e assina pelo Portal de Assinatura.","Documentos podem ser cancelados e reemitidos se necessário."],
+        tip: "A assinatura digital do paciente segue o conceito de assinatura eletrônica — juridicamente válida." },
+      { icon: "ti-user-edit", title: "Estagiário e residente",
+        points: ["Usuários configurados como estagiários só podem salvar documentos, não confirmar.","Um supervisor com permissão 'Permite avaliar' é responsável por confirmar os documentos.","Essa hierarquia garante supervisão clínica adequada."],
+        tip: null }
+    ]
+  },
+  alta: {
+    title: "Alta do Paciente",
+    badge: "Cap. 45, 55",
+    sections: [
+      { icon: "ti-calendar-check", title: "Provisionar alta",
+        points: ["Permite registrar uma previsão de data de alta antes que ela aconteça.","Ao acessar o prontuário, o sistema alerta sobre a previsão (se parâmetro ativo).","Facilita o planejamento de leitos pela equipe de gestão."],
+        tip: null },
+      { icon: "ti-stethoscope", title: "Alta médica",
+        points: ["Registra a decisão médica de alta do paciente.","Pode exigir preenchimento do Sumário de Alta (RAC) antes de finalizar."],
+        tip: null },
+      { icon: "ti-logout", title: "Alta hospitalar",
+        points: ["Finaliza o atendimento de internação do paciente no sistema.","Nenhum lançamento é permitido após a alta ou após 24h do atendimento.","O prontuário completo pode ser impresso após a alta."],
+        tip: null },
+      { icon: "ti-file-check", title: "RAC — Registro de Atendimento Clínico (V.01/26)",
+        points: ["Implementado na V.01/26 — conjunto padronizado de informações do atendimento ambulatorial.","Abrange dados clínicos e administrativos para continuidade do cuidado.","Suporta interoperabilidade entre sistemas de informação em saúde."],
+        tip: "O RAC é especialmente relevante para atendimentos ambulatoriais e coordenação da atenção." }
+    ]
+  },
+  especiais: {
+    title: "Rotinas Especiais",
+    badge: "Vários capítulos",
+    sections: [
+      { icon: "ti-ribbon", title: "Oncologia (Cap. 27)",
+        points: ["Cadastro de protocolos com fórmulas de cálculo de dose por superfície corporal.","Agenda de quimioterapia com controle de ciclos e sessões.","Validação farmacêutica: farmácia confere a prescrição antes da manipulação.","Integração com estoque: gera manipulação ao planejar, prescrever ou validar."],
+        tip: "A dose calculada pode ser ajustada dentro de uma margem configurável sem necessidade de justificativa." },
+      { icon: "ti-eye", title: "Oftalmologia (Cap. 29)",
+        points: ["Lançamento de laudos de exames oftalmológicos (refração, pressão, etc.).","Exames complementares e resultados padrão configuráveis.","Modelo de cabeçalho exclusivo para impressão oftalmológica."],
+        tip: null },
+      { icon: "ti-file-invoice", title: "AIH — Autorização de Internação Hospitalar (Cap. 19)",
+        points: ["Laudo de AIH pode ser exigido nas primeiras 24h, 48h ou após a 2ª prescrição.","Enquanto não preenchido, é possível consultar mas não criar novas composições."],
+        tip: null },
+      { icon: "ti-activity", title: "Índice Prognóstico (Cap. 34)",
+        points: ["Suporta os índices APACHE II e SOFA.","Pode ser exigido antes de iniciar a prescrição (alertar, alertar e obrigar ou não validar).","Visualização consolidada de todos os índices calculados."],
+        tip: null },
+      { icon: "ti-alert-triangle", title: "Notificação Compulsória (Cap. 14)",
+        points: ["Ativada por CID — o diagnóstico dispara automaticamente a notificação.","Notificações enviadas por e-mail para Secretaria Municipal, Estadual ou Ministério da Saúde.","Inclui tipos: epidemiológica, interna, semanal e conclusão."],
+        tip: null },
+      { icon: "ti-report", title: "APAC (Cap. 33)",
+        points: ["Rotina para preenchimento de laudos APAC para procedimentos de alta complexidade.","Configurações específicas necessárias antes de utilizar."],
+        tip: null }
+    ]
+  }
+};
+
+const PEP_CONTEXT = `Você é um assistente especialista no Manual do PEP (Prontuário Eletrônico do Paciente) Hospital Geral — SPDATA SGH® Versão 25.
+
+CONTEÚDO PRINCIPAL DO MANUAL:
+
+1. INTRODUÇÃO: O PEP é um módulo destinado ao preenchimento de dados e informações de saúde do paciente. Mantém a segurança do paciente, arquiva dados de relevância e automatiza o trabalho dos profissionais.
+
+2. PERMISSÕES: Dois requisitos mínimos: (a) Permissão do grupo ao módulo PEP via SGH > Permissões > P.E.P; (b) Cadastro e vinculação do CBO ao usuário. Dados obrigatórios do profissional: Nome, CPF, CBO, competência, UF, Conselho profissional e Nº conselho. Vinculação: SGH > Usuários > Manutenção de Papéis > opção 4 – Operador do Sistema.
+
+3. PARAMETRIZAÇÃO: Parâmetros I incluem: controlar checagem de enfermagem (itens checados vão ao Balanço Hídrico), checar somente itens assinados, realizar aprazamento pela enfermagem (ativa para todos os setores), tolerância para lançamento atrasado (máx. 2h), validar duplicidade de medicamentos (por item ou princípio ativo). Sempre clicar em 'Confirmar' após alterações. Integrações com estoque: requisição de saída ou dispensação por horário; validar antimicrobiano ativa a rotina de ATB. Parâmetros de impressão: logotipo, horários, modo zebrado, frente e verso, tamanho da fonte.
+
+4. PRESCRIÇÃO GERAL (Cap 5): Tipos: medicamentos, soluções EV, procedimentos clínicos, dietas (livre, oral, enteral, parenteral, jejum), hemocomponentes, respiração espontânea, nível de atividade. Frequência 24/24h adicionada na V.01/26. Kits de medicamentos e soluções EV contínua podem ser configurados. Validações: duplicidade, alergia CBARA, antimicrobiano, índice prognóstico. Protocolos padrão podem ser criados.
+
+5. CHECAGEM DE ENFERMAGEM (Cap 8, 11): Aprazamento ativa para todos os setores (não pode ser específico). V.02/25 implementou checagem por código de barras com rastreabilidade em tempo real. Balanço Hídrico registra entradas/saídas; horários de fechamento configuráveis.
+
+6. EXAMES (Cap 12): Solicitação dentro do prontuário. Kits de exames para solicitar grupos. Integração com laboratórios terceiros via Web Service. Alerta de exames liberados configurável.
+
+7. TEMPLATES E ANAMNESE (Cap 16, 17): Templates com perguntas variadas (CID10, texto livre, procedimentos, etc.). Anamnese pode ser obrigatória antes da prescrição. Resumo clínico pode abrir automaticamente.
+
+8. ASSINATURA DIGITAL (Cap 52, 56): Tipos: A1 (arquivo local), A3 (token), SafeWeb (nuvem), Valid (nuvem). Habilitação por usuário possível. Assinatura em lote para pendências acumuladas. Assinatura digital do paciente via Portal de Assinatura. Estagiários só salvam; supervisor confirma.
+
+9. ALTA (Cap 45, 55): Provisionar alta: previsão de data. Alta médica: decisão clínica. Alta hospitalar: finaliza internação. RAC (V.01/26): Registro de Atendimento Clínico para ambulatório.
+
+10. ONCOLOGIA (Cap 27): Protocolos com cálculo de dose por superfície corporal. Agenda de quimioterapia com ciclos/sessões. Validação farmacêutica. Integração com estoque ao planejar/prescrever/validar.
+
+11. OUTRAS ROTINAS: Oftalmologia (laudos e exames), AIH (laudo obrigatório em até 24h/48h configurável), APAC (procedimentos alta complexidade), Índice Prognóstico (APACHE II, SOFA), Notificação Compulsória (ativada por CID, envio por e-mail), Partograma, Curva de Crescimento Infantil, Interconsulta, Encaminhamento, Processo de Enfermagem (SAE), Ficha Anestésica.
+
+Responda em português do Brasil. Seja claro, didático e objetivo. Use formatação simples.`;
+
+let currentView = 'overview';
+let chatMessages = [];
+let isLoading = false;
+const expanded = {};
+
+function navigate(view) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('nav-' + view);
+  if (el) el.classList.add('active');
+  currentView = view;
+  render();
+}
+
+function toggleCard(id) {
+  expanded[id] = !expanded[id];
+  const body = document.getElementById('cb-' + id);
+  const chev = document.getElementById('chev-' + id);
+  if (body) body.style.display = expanded[id] ? 'block' : 'none';
+  if (chev) chev.className = 'chevron ti ti-chevron-down' + (expanded[id] ? ' open' : '');
+}
+
+function render() {
+  const main = document.getElementById('main');
+  if (currentView === 'overview') renderOverview(main);
+  else if (currentView === 'chat') renderChat(main);
+  else renderModule(main, currentView);
+}
+
+function renderOverview(container) {
+  const data = CONTENT.overview;
+  const grid = data.modules.map(m => `
+    <div class="module-card" onclick="navigate('${m.nav}')">
+      <div class="mc-icon"><i class="ti ${m.icon}"></i></div>
+      <div class="mc-name">${m.name}</div>
+      <div class="mc-desc">${m.desc}</div>
+    </div>`).join('');
+
+  container.innerHTML = `<div class="content-wrap">
+    <div class="page-header">
+      <div class="page-title">${data.title}</div>
+      <div class="page-badge">${data.badge}</div>
+    </div>
+    <p style="font-size:13.5px;color:var(--text2);margin-bottom:18px;line-height:1.6">O PEP (Prontuário Eletrônico do Paciente) é o módulo central do SPDATA SGH® para registrar dados de saúde do paciente. Selecione um módulo abaixo para estudar seus pontos principais.</p>
+    <div class="modules-grid">${grid}</div>
+    <div class="cta-card">
+      <i class="ti ti-robot"></i>
+      <div><div class="cta-title">Assistente IA do Manual</div><div class="cta-desc">Tire dúvidas sobre qualquer funcionalidade do PEP com o assistente de IA treinado no manual.</div></div>
+      <button class="cta-btn" onclick="navigate('chat')">Abrir chat →</button>
+    </div>
+  </div>`;
+}
+
+function renderModule(container, view) {
+  const data = CONTENT[view];
+  if (!data) return;
+  const sections = data.sections.map((s, i) => {
+    const id = view + i;
+    if (!(id in expanded)) expanded[id] = true;
+    return `
+      <div class="card">
+        <div class="card-header" onclick="toggleCard('${id}')">
+          <div class="card-header-icon"><i class="ti ${s.icon}"></i></div>
+          <div class="card-header-title">${s.title}</div>
+          <i class="chevron ti ti-chevron-down${expanded[id] ? ' open' : ''}" id="chev-${id}"></i>
+        </div>
+        <div class="card-body" id="cb-${id}" style="display:${expanded[id] ? 'block' : 'none'}">
+          ${s.points.map(p => `<div class="key-point"><div class="kp-dot"></div><div>${p}</div></div>`).join('')}
+          ${s.tip ? `<div class="tip-box"><i class="ti ti-bulb"></i><div><strong>Dica:</strong> ${s.tip}</div></div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `<div class="content-wrap">
+    <div class="page-header">
+      <div class="back-btn" onclick="navigate('overview')"><i class="ti ti-arrow-left"></i></div>
+      <div class="page-title">${data.title}</div>
+      <div class="page-badge">${data.badge}</div>
+    </div>
+    ${sections}
+    <div class="bottom-hint">
+      <i class="ti ti-message-question"></i>
+      <span>Ficou com dúvidas sobre esse módulo?</span>
+      <button onclick="navigate('chat')">Perguntar ao assistente →</button>
+    </div>
+  </div>`;
+}
+
+const CHIPS = ["Como configurar permissões de acesso?","O que é o aprazamento de enfermagem?","Como funciona a assinatura digital?","Quais os tipos de dieta no PEP?","Como ativar a checagem por código de barras?","Como funciona a alta do paciente?"];
+
+function renderChat(container) {
+  let msgsHtml = '';
+  if (chatMessages.length === 0) {
+    msgsHtml = `<div class="chat-empty">
+      <i class="ti ti-robot"></i>
+      <div class="ce-title">Assistente do Manual PEP</div>
+      <div class="ce-desc">Pergunte qualquer coisa sobre o SPDATA SGH® Versão 25. Estou treinado no manual completo.</div>
+    </div>`;
+  } else {
+    msgsHtml = chatMessages.map(m => {
+      if (m.role === 'user') return `<div class="msg msg-user"><div class="bubble">${m.content}</div></div>`;
+      return `<div class="msg msg-ai">
+        <div class="ai-avatar"><i class="ti ti-robot"></i></div>
+        <div class="bubble-wrap">
+          <div class="bubble-label">PEP Assistente</div>
+          <div class="bubble">${m.content.replace(/\n/g,'<br>')}</div>
+        </div>
+      </div>`;
+    }).join('');
+    if (isLoading) msgsHtml += `<div class="msg msg-ai">
+      <div class="ai-avatar"><i class="ti ti-robot"></i></div>
+      <div class="bubble-wrap"><div class="bubble-label">PEP Assistente</div>
+      <div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>
+    </div>`;
+  }
+
+  const chipsHtml = chatMessages.length === 0 ? `<div class="chips-area">${CHIPS.map(c=>`<div class="chip" onclick="sendChip(this)">${c}</div>`).join('')}</div>` : '';
+
+  container.innerHTML = `<div class="chat-area">
+    <div class="chat-topbar">
+      <div class="back-btn" onclick="navigate('overview')"><i class="ti ti-arrow-left"></i></div>
+      <div class="ct-title">Assistente IA do Manual</div>
+      ${chatMessages.length > 0 ? `<button class="clear-btn" onclick="clearChat()">Limpar conversa</button>` : ''}
+    </div>
+    <div class="chat-messages" id="msgs">${msgsHtml}</div>
+    ${chipsHtml}
+    <div class="chat-input-area">
+      <textarea id="inp" placeholder="Pergunte sobre qualquer funcionalidade do PEP..." onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" id="sbtn" onclick="sendMessage()" ${isLoading?'disabled':''}><i class="ti ti-send"></i></button>
+    </div>
+  </div>`;
+
+  const msgs = document.getElementById('msgs');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function sendChip(el) {
+  const text = el.textContent;
+  const inp = document.getElementById('inp');
+  if (inp) inp.value = text;
+  sendMessage();
+}
+
+function clearChat() {
+  chatMessages = [];
+  render();
+}
+
+async function sendMessage() {
+  const inp = document.getElementById('inp');
+  if (!inp || isLoading) return;
+  const text = inp.value.trim();
+  if (!text) return;
+  chatMessages.push({ role: 'user', content: text });
+  inp.value = '';
+  isLoading = true;
+  render();
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: PEP_CONTEXT,
+        messages: chatMessages.map(m => ({ role: m.role, content: m.content }))
+      })
+    });
+    const data = await res.json();
+    chatMessages.push({ role: 'assistant', content: data.content?.[0]?.text || "Não consegui processar a resposta." });
+  } catch(e) {
+    chatMessages.push({ role: 'assistant', content: "Ocorreu um erro ao conectar com o assistente. Tente novamente." });
+  }
+  isLoading = false;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
