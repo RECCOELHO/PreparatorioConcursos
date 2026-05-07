@@ -860,7 +860,7 @@ function searchManual(query) {
   scored.sort((a, b) => b.score - a.score);
   let result = '';
   let charCount = 0;
-  const maxChars = 35000;
+  const maxChars = 30000;
   const top5 = scored.filter(s => s.score > 0).slice(0, 5);
   for (const section of top5) {
     if (charCount + section.content.length > maxChars) {
