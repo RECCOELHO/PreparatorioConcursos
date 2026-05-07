@@ -320,7 +320,7 @@
 
 <script src="manual_data.js"></script>
 <script>
-const GROQ_API_KEY = "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";
+// Configurações do Assistente (Chave movida para o backend por segurança)
 
 const CONTENT = {
   overview: {
@@ -697,17 +697,11 @@ async function sendMessage() {
       ...chatMessages.map(m => ({ role: m.role, content: m.content }))
     ];
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('/api/chat', {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: messages,
-        max_tokens: 2048,
-        temperature: 0.3
+        messages: messages
       })
     });
     const data = await res.json();
