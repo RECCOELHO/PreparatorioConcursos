@@ -320,7 +320,11 @@
 
 <script src="manual_data.js"></script>
 <script>
+<<<<<<< HEAD
 // Configurações do Assistente (Chave movida para o backend por segurança)
+=======
+const GEMINI_API_KEY = "AIzaSyC2gDg-lyxeePERkjF1zd9mYgCIkVqCs2U"; // Cole a chave gratuita gerada no Google AI Studio aqui
+>>>>>>> b13a13b63f0afbbef78e652b1e2a0a65c3f9f31c
 
 const CONTENT = {
   overview: {
@@ -525,7 +529,7 @@ CONTEÚDO PRINCIPAL DO MANUAL:
 
 11. OUTRAS ROTINAS: Oftalmologia (laudos e exames), AIH (laudo obrigatório em até 24h/48h configurável), APAC (procedimentos alta complexidade), Índice Prognóstico (APACHE II, SOFA), Notificação Compulsória (ativada por CID, envio por e-mail), Partograma, Curva de Crescimento Infantil, Interconsulta, Encaminhamento, Processo de Enfermagem (SAE), Ficha Anestésica.
 
-Responda em português do Brasil. Seja claro, didático e objetivo. Use formatação simples.`;
+Responda em português do Brasil. Seja claro, didático e objetivo. Use formatação simples.\n\nCONTEÚDO COMPLETO DO MANUAL:\n\n` + (typeof FULL_MANUAL_TEXT !== 'undefined' ? FULL_MANUAL_TEXT : 'Erro ao carregar o manual');
 
 let currentView = 'overview';
 let chatMessages = [];
@@ -688,6 +692,7 @@ async function sendMessage() {
   isLoading = true;
   render();
   try {
+<<<<<<< HEAD
     // RAG: busca seções relevantes do manual completo
     const relevantContext = searchManual(text);
 
@@ -710,6 +715,29 @@ async function sendMessage() {
       chatMessages.push({ role: 'assistant', content: "Erro da API: " + data.error.message });
     } else {
       const responseText = data.choices?.[0]?.message?.content || "Não consegui processar a resposta.";
+=======
+    // Formata o histórico de mensagens para o padrão do Gemini (user/model)
+    const geminiMessages = chatMessages.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: PEP_CONTEXT }] },
+        contents: geminiMessages,
+        generationConfig: { maxOutputTokens: 2048 }
+      })
+    });
+    const data = await res.json();
+    
+    if (data.error) {
+      chatMessages.push({ role: 'assistant', content: "Erro da API: " + data.error.message });
+    } else {
+      const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Não consegui processar a resposta.";
+>>>>>>> b13a13b63f0afbbef78e652b1e2a0a65c3f9f31c
       chatMessages.push({ role: 'assistant', content: responseText });
     }
   } catch(e) {
