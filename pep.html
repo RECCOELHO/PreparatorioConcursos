@@ -318,7 +318,10 @@
   <main class="main" id="main"></main>
 </div>
 
+<script src="manual_data.js"></script>
 <script>
+// Configurações do Assistente (Chave movida para o backend por segurança)
+
 const CONTENT = {
   overview: {
     title: "Visão Geral — PEP Hospital Geral",
@@ -685,23 +688,103 @@ async function sendMessage() {
   isLoading = true;
   render();
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    // RAG: busca seções relevantes do manual completo
+    const relevantContext = searchManual(text);
+
+    // Monta mensagens no formato OpenAI (compatível com Groq)
+    const messages = [
+      { role: 'system', content: PEP_CONTEXT + '\n\nTRECHOS RELEVANTES DO MANUAL COMPLETO:\n\n' + relevantContext },
+      ...chatMessages.map(m => ({ role: m.role, content: m.content }))
+    ];
+
+    const res = await fetch('/api/chat', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: PEP_CONTEXT,
-        messages: chatMessages.map(m => ({ role: m.role, content: m.content }))
+        prompt: PEP_CONTEXT + '\n\nTRECHOS RELEVANTES DO MANUAL COMPLETO:\n\n' + relevantContext + '\n\nPERGUNTA DO USUÁRIO: ' + text
       })
     });
     const data = await res.json();
-    chatMessages.push({ role: 'assistant', content: data.content?.[0]?.text || "Não consegui processar a resposta." });
+
+    if (data.error) {
+      chatMessages.push({ role: 'assistant', content: "Erro da API: " + data.error.message });
+    } else {
+      const responseText = data.choices?.[0]?.message?.content || "Não consegui processar a resposta.";
+      chatMessages.push({ role: 'assistant', content: responseText });
+    }
   } catch(e) {
     chatMessages.push({ role: 'assistant', content: "Ocorreu um erro ao conectar com o assistente. Tente novamente." });
   }
   isLoading = false;
   render();
+}
+
+// RAG: divide o manual em seções e busca as mais relevantes
+function getManualSections() {
+  if (typeof FULL_MANUAL_TEXT === 'undefined') return [];
+  if (window._manualSections) return window._manualSections;
+
+  const raw = FULL_MANUAL_TEXT;
+  // Divide por capítulos/seções usando os padrões do manual
+  const sectionRegex = /(?=\n\d+(?:\.\d+)*\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g;
+  const parts = raw.split(sectionRegex).filter(s => s.trim().length > 100);
+
+  window._manualSections = parts.map(section => {
+    const lines = section.trim().split('\n').filter(l => l.trim());
+    const title = lines[0] || '';
+    return { title: title.trim(), content: section.trim() };
+  });
+
+  return window._manualSections;
+}
+
+function searchManual(query) {
+  const sections = getManualSections();
+  if (sections.length === 0) return 'Manual não carregado.';
+
+  // Normaliza a query
+  const queryWords = query.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .split(/\s+/)
+    .filter(w => w.length > 2);
+
+  // Pontua cada seção por relevância
+  const scored = sections.map(section => {
+    const normalized = (section.title + ' ' + section.content).toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    let score = 0;
+    queryWords.forEach(word => {
+      const matches = (normalized.match(new RegExp(word, 'g')) || []).length;
+      score += matches;
+    });
+    // Bonus para match no título
+    const titleNorm = section.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    queryWords.forEach(word => {
+      if (titleNorm.includes(word)) score += 10;
+    });
+    return { ...section, score };
+  });
+
+  // Pega as top 5 seções mais relevantes (max ~30K chars para caber no contexto)
+  scored.sort((a, b) => b.score - a.score);
+  let result = '';
+  let charCount = 0;
+  const maxChars = 20000;
+  const top5 = scored.filter(s => s.score > 0).slice(0, 5);
+  for (const section of top5) {
+    if (charCount + section.content.length > maxChars) {
+      // Trunca a seção se necessário
+      const remaining = maxChars - charCount;
+      if (remaining > 500) {
+        result += '\n---\n' + section.content.substring(0, remaining) + '...\n';
+      }
+      break;
+    }
+    result += '\n---\n' + section.content + '\n';
+    charCount += section.content.length;
+  }
+
+  return result || 'Nenhuma seção relevante encontrada no manual.';
 }
 
 render();
