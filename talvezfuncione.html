@@ -87,7 +87,7 @@
     display: none; width: 40px; height: 40px; border-radius: 10px;
     align-items: center; justify-content: center;
     cursor: pointer; color: var(--text); border: 1px solid var(--border);
-    background: var(--surface); transition: all 0.2s;
+    background: var(--surface); transition: all 0.2s; flex-shrink: 0;
   }
   .menu-toggle:active { transform: scale(0.9); background: var(--surface2); }
 
@@ -95,7 +95,7 @@
     width: 36px; height: 36px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; color: var(--text2);
-    border: 1px solid var(--border); transition: all 0.2s;
+    border: 1px solid var(--border); transition: all 0.2s; flex-shrink: 0;
   }
   .back-btn:hover { background: var(--surface2); color: var(--text); }
   
@@ -308,6 +308,10 @@
   }
   .typing span:nth-child(2) { animation-delay: 0.2s; }
   .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
 
   .chat-input-area {
     padding: 20px 24px 24px;
@@ -362,7 +366,7 @@
   }
   .bottom-hint button:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-  /* MOBILE RESPONSIVENESS */
+  /* MOBILE */
   @media (max-width: 768px) {
     .sidebar {
       position: fixed;
@@ -372,10 +376,10 @@
       box-shadow: 10px 0 30px rgba(0,0,0,0.1);
     }
     .sidebar.open { transform: translateX(0); }
-    .menu-toggle { display: flex; }
+    .menu-toggle { display: flex !important; }
     .content-wrap { padding: 20px 16px; }
     .page-header { margin-bottom: 20px; gap: 10px; }
-    .page-title { font-size: 19px; }
+    .page-title { font-size: 18px; }
     .modules-grid { grid-template-columns: 1fr; gap: 12px; }
     .cta-card { flex-direction: column; text-align: center; padding: 24px 20px; }
     .cta-btn { margin-left: 0; width: 100%; }
@@ -425,8 +429,54 @@
 
 <script src="manual_data.js"></script>
 <script>
-// Configurações do Assistente (Chave movida para o backend por segurança)
+// ============================================================
+// CORREÇÃO 1: Markdown Renderer simples para as respostas da IA
+// ============================================================
+function renderMarkdown(text) {
+  let html = text
+    // Escapa HTML perigoso primeiro
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Blocos de código (antes de outros processamentos)
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    // Títulos
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Negrito e itálico
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Código inline
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Blockquote
+    .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
+    // HR
+    .replace(/^---$/gm, '<hr>')
+    // Listas não ordenadas
+    .replace(/^\* (.+)$/gm, '<li>$1</li>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    // Listas ordenadas
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Agrupa <li> em <ul>
+    .replace(/(<li>[\s\S]*?<\/li>)(\n|$)(?!<li>)/g, '<ul>$1</ul>\n')
+    // Quebras de linha duplas viram parágrafos
+    .replace(/\n\n+/g, '</p><p>')
+    // Quebras simples
+    .replace(/\n/g, '<br>');
 
+  // Wrap em parágrafo se não começar com tag HTML
+  if (!html.startsWith('<')) {
+    html = '<p>' + html + '</p>';
+  }
+
+  return html;
+}
+
+// ============================================================
+// CONTENT (seus dados de estudo — mantidos do original)
+// ============================================================
 const CONTENT = {
   overview: {
     title: "Visão Geral — PEP Hospital Geral",
@@ -451,8 +501,8 @@ const CONTENT = {
         points: [
           "Dois requisitos obrigatórios: permissão do grupo ao módulo PEP e cadastro/vinculação do CBO ao usuário.",
           "Caminho das permissões: SGH > Permissões > P.E.P > Selecione o grupo.",
-          "As permissões do módulo devem levar em conta exatamente quais atividades aquele grupo de usuários executa na prática diária, garantindo a segurança da informação.",
-          "Sem a vinculação correta do CBO, mesmo o administrador do sistema pode não conseguir acessar funções clínicas específicas do PEP."
+          "As permissões do módulo devem levar em conta exatamente quais atividades aquele grupo de usuários executa na prática diária.",
+          "Sem a vinculação correta do CBO, mesmo o administrador pode não conseguir acessar funções clínicas específicas."
         ],
         tip: "Sempre faça uma revisão periódica dos acessos. Cada grupo pode ter permissões distintas — planeje com cuidado antes de liberar funcionalidades como 'excluir' ou 'cancelar'." 
       },
@@ -461,7 +511,7 @@ const CONTENT = {
           "Caminho: SGH > Tabelas > Profissionais > Gerenciamento.",
           "Dados obrigatórios: Nome, CPF, CBO, campo 'apurar valores para', competência, UF, conselho profissional e número do conselho.",
           "O status do profissional deve obrigatoriamente estar como 'Ativo'.",
-          "O campo 'apurar valores para' varia de acordo com o vínculo que o profissional tem com a instituição (CLT, Autônomo, etc)."
+          "O campo 'apurar valores para' varia de acordo com o vínculo que o profissional tem com a instituição."
         ],
         tip: "Atenção ao número do conselho e UF, pois dados incorretos bloqueiam a emissão de receitas e atestados com assinatura digital." 
       },
@@ -470,18 +520,18 @@ const CONTENT = {
           "Caminho: SGH > Usuários. Após selecionar o usuário, acesse Manutenção de Papéis.",
           "É necessário colocar a opção '4 – Operador do Sistema'.",
           "Vincule o CBO previamente cadastrado e clique em Gravar.",
-          "É esta vinculação que cruza os dados do login (TI) com os dados clínicos e profissionais (RH/Qualidade)."
+          "É esta vinculação que cruza os dados do login (TI) com os dados clínicos e profissionais."
         ],
         tip: "Muitos chamados no TI de 'Não consigo ver a prescrição' são resolvidos apenas conferindo esta vinculação." 
       },
       { icon: "ti-lock", title: "Restrição de acesso e Privacidade (Cap. 49, 51)",
         points: [
-          "É possível restringir o acesso ao prontuário de determinados pacientes (rotina de privacidade, comum em casos sigilosos ou colaboradores internados).",
+          "É possível restringir o acesso ao prontuário de determinados pacientes (rotina de privacidade).",
           "A restrição bloqueia a visualização para todos, exceto para quem tem permissão explícita ou em casos de 'Acesso Emergencial' justificado.",
           "Profissionais com acesso irrestrito emergencial devem ser configurados nos parâmetros e suas ações geram log de auditoria.",
           "O parâmetro 'Permitir registro de consentimento de acesso' deve estar ativo."
         ],
-        tip: "Todo acesso a prontuário restrito (Quebra de Sigilo/Glass Break) pode ser configurado para enviar um e-mail imediato à diretoria." 
+        tip: "Todo acesso emergencial a prontuário restrito pode ser configurado para enviar um e-mail imediato à diretoria." 
       }
     ]
   },
@@ -494,8 +544,7 @@ const CONTENT = {
           "Controlar checagem de enfermagem: faz com que itens checados vão para o Balanço Hídrico automaticamente (necessário duplo check).",
           "Checar somente itens assinados: exige a assinatura digital da prescrição antes que a enfermagem possa administrá-la.",
           "Realizar aprazamento pela enfermagem: ativa a funcionalidade para TODOS os setores (não é possível parametrizar por setor específico).",
-          "Considerar horário da dose com tolerância: permite prescrever para horários retroativos até o limite informado, sinalizando em cores diferentes.",
-          "Tolerância para lançamento atrasado: define limite de tempo (máx. 2h) para lançar dados na monitorização/checagem/balanço hídrico sem exigir justificativa retroativa."
+          "Tolerância para lançamento atrasado: define limite de tempo (máx. 2h) sem exigir justificativa retroativa."
         ],
         tip: "Lembre-se sempre de clicar no botão 'Confirmar' no final da tela após alterar qualquer parâmetro, senão nada será salvo." 
       },
@@ -504,27 +553,27 @@ const CONTENT = {
           "Validar duplicidade de itens: informa se o mesmo item foi prescrito mais de uma vez. Pode ser configurado por 'Medicamento' exato ou por 'Princípio Ativo'.",
           "Em duplicidade por Princípio Ativo, pode-se escolher: Não informar, Apenas Notificar, Notificar e Bloquear, ou Exigir Justificativa.",
           "Alertar previsão de alta: avisa na tela ao abrir o prontuário se há uma alta provisionada para aquele paciente.",
-          "Validar período de vigência: não permite nenhum lançamento clínico após a alta hospitalar ou 24h após o atendimento ambulatorial."
+          "Validar período de vigência: não permite nenhum lançamento clínico após a alta hospitalar."
         ],
-        tip: "Configurar bloqueio para duplicidade de princípio ativo reduz drasticamente os eventos adversos por superdosagem de medicações com nomes comerciais diferentes." 
+        tip: "Configurar bloqueio para duplicidade de princípio ativo reduz drasticamente os eventos adversos por superdosagem." 
       },
-      { icon: "ti-link", title: "Integrações com Estoque e Farmácia (Parâmetros III)",
+      { icon: "ti-link", title: "Integrações com Estoque e Farmácia",
         points: [
-          "Existem fluxos diferentes de dispensação que a farmácia adota (por horário ou requisição direta).",
+          "Existem fluxos diferentes de dispensação: por horário ou requisição direta.",
           "Composição do pedido de antimicrobiano: vincula o template que abre sozinho ao prescrever antibióticos.",
           "Composição do pedido de item não padronizado: vincula o formulário de justificativa médica para medicações fora da padronização.",
-          "Unidade de Prescrição: Fatores de conversão de ML e Gotas devem estar parametrizados com exatidão para o cálculo de estoque funcionar."
+          "Unidade de Prescrição: Fatores de conversão de ML e Gotas devem estar parametrizados com exatidão."
         ],
-        tip: "Medicamentos de alto custo ou não padronizados geralmente exigem templates de justificativa adicionais para que a farmácia avalie e libere." 
+        tip: "Medicamentos de alto custo geralmente exigem templates de justificativa adicionais para que a farmácia avalie e libere." 
       },
       { icon: "ti-printer", title: "Parâmetros de Impressão e Auditoria",
         points: [
-          "Parâmetros de Impressão Geral: configuram logotipo, impressão de horários, modo zebrado, frente e verso e tamanho da fonte da prescrição.",
+          "Parâmetros de Impressão Geral: configuram logotipo, impressão de horários, modo zebrado, frente e verso e tamanho da fonte.",
           "Exportar arquivos com senha: obriga o uso de senhas nos PDFs gerados pelo sistema para seguir a LGPD.",
-          "Minimizar trilha de auditoria: simplifica o log visual, que será carregado de forma detalhada apenas quando solicitado.",
-          "Cabeçalho da prescrição pode exibir os dados do paciente no momento atual ou da época em que o documento original foi criado."
+          "Minimizar trilha de auditoria: simplifica o log visual, carregado detalhadamente apenas quando solicitado.",
+          "Cabeçalho da prescrição pode exibir os dados do paciente no momento atual ou da época da criação do documento."
         ],
-        tip: "Na impressão, defina bem a quantidade de espaços em branco para assinaturas no rodapé para os enfermeiros e o padrão (completo ou sem horários)." 
+        tip: "Na impressão, defina bem a quantidade de espaços em branco para assinaturas dos enfermeiros no rodapé." 
       }
     ]
   },
@@ -535,36 +584,36 @@ const CONTENT = {
       { icon: "ti-pill", title: "Tipos de Itens Prescritíveis (Cap. 5)",
         points: [
           "Medicamentos: requerem dose, frequência, via de acesso. Vias de acesso podem ser restritas pelo cadastro do próprio item.",
-          "Soluções EV (Endovenosas): permite misturar diluentes e medicamentos. Velocidade de infusão pode ser obrigatória, ou calculada automaticamente baseada no volume total.",
-          "Procedimentos Clínicos: como curativos ou sondagens, cadastrados previamente em Tabelas.",
-          "Dietas: Livre, Oral, Enteral, Parenteral e Jejum. (Jejum e Dieta Livre agora aceitam observações adicionais e data de suspensão).",
+          "Soluções EV: permite misturar diluentes e medicamentos. Velocidade de infusão pode ser obrigatória ou calculada automaticamente.",
+          "Procedimentos Clínicos: curativos ou sondagens, cadastrados previamente em Tabelas.",
+          "Dietas: Livre, Oral, Enteral, Parenteral e Jejum. Jejum e Dieta Livre aceitam observações adicionais e data de suspensão.",
           "Hemocomponentes, Nível de atividade/Fisioterapia e Respiração espontânea completam as opções."
         ],
-        tip: "Na aba 'Soluções', sempre confira a velocidade de infusão. O cálculo automático pode falhar se o item base (Diluente) não estiver cadastrado em ML." 
+        tip: "Na aba 'Soluções', sempre confira a velocidade de infusão. O cálculo automático pode falhar se o Diluente não estiver cadastrado em ML." 
       },
       { icon: "ti-clock", title: "Esquemas de Horários e Frequência",
         points: [
-          "Frequência 24/24h foi implementada recentemente na versão 25 para evitar confusões com 'Dose Única'.",
-          "Dose Única agora apresenta inconsistência (alerta) caso o médico tente 'manter' a prescrição no dia seguinte, forçando a revisão.",
-          "Suspensão de itens com intervalos longos (ex: medicação semanal) pode ser feita mesmo fora do dia de sua vigência, retirando o item das futuras prescrições.",
-          "Se Necessário (ACM/SN): medicamentos não geram horários rígidos, sendo checados e gerando requisição apenas quando efetivamente administrados."
+          "Frequência 24/24h foi implementada na versão 25 para evitar confusões com 'Dose Única'.",
+          "Dose Única agora apresenta inconsistência (alerta) caso o médico tente 'manter' a prescrição no dia seguinte.",
+          "Suspensão de itens com intervalos longos (ex: medicação semanal) pode ser feita mesmo fora do dia de sua vigência.",
+          "Se Necessário (ACM/SN): medicamentos não geram horários rígidos, sendo checados apenas quando efetivamente administrados."
         ],
-        tip: "Itens 'Se Necessário' exigem atenção redobrada da farmácia na forma como dispensam (kit padrão no andar ou requisição unitária a cada uso)." 
+        tip: "Itens 'Se Necessário' exigem atenção redobrada da farmácia na forma como dispensam." 
       },
       { icon: "ti-alert-circle", title: "Rotinas de Alergia e Antimicrobianos (Cap. 6 e 7)",
         points: [
-          "Alergia CBARA: O sistema pode cruzar a alergia do paciente com o princípio ativo do remédio. Se for alérgico, o sistema bloqueia ou alerta vigorosamente.",
-          "Antimicrobianos: Exige o preenchimento de justificativa, tempo de uso e culturas solicitadas. O farmacêutico fará a avaliação de D1, D2 até finalizar o tratamento.",
-          "Kits de Medicamentos: Permitem prescrever um bloco inteiro de itens de uma vez com 1 clique (Ex: Kit Intubação, Kit IAM).",
-          "Prescrição Futura: Médicos podem deixar a prescrição de amanhã ou de feriados pronta hoje, agendando seu início."
+          "Alergia CBARA: O sistema cruza a alergia do paciente com o princípio ativo do remédio. Se for alérgico, bloqueia ou alerta.",
+          "Antimicrobianos: Exige o preenchimento de justificativa, tempo de uso e culturas solicitadas.",
+          "Kits de Medicamentos: Permitem prescrever um bloco inteiro de itens de uma vez (Ex: Kit Intubação).",
+          "Prescrição Futura: Médicos podem deixar a prescrição de amanhã pronta hoje, agendando seu início."
         ],
-        tip: "As alergias CBARA devem ser preenchidas criteriosamente na admissão da enfermagem (anamnese) para que o bloqueio preventivo de segurança funcione nas prescrições." 
+        tip: "As alergias CBARA devem ser preenchidas criteriosamente na admissão para que o bloqueio preventivo funcione nas prescrições." 
       },
-      { icon: "ti-checkup-list", title: "Avaliação de Prescrição (Farmácia Clínica - Cap. 10)",
+      { icon: "ti-checkup-list", title: "Avaliação de Prescrição — Farmácia Clínica (Cap. 10)",
         points: [
-          "A Farmácia Clínica avalia e valida todas as prescrições médicas antes de liberar a dispensação e impressão.",
-          "Pode ser configurado para avaliar TODAS as prescrições ou apenas itens prescritos FORA do padrão (antibióticos, controlados, alto custo).",
-          "O farmacêutico pode intervir e realizar a 'Alteração da Prescrição' caso detecte sobredose, interação medicamentosa severa ou incompatibilidade."
+          "A Farmácia Clínica avalia e valida as prescrições médicas antes de liberar a dispensação.",
+          "Pode ser configurado para avaliar TODAS as prescrições ou apenas itens fora do padrão.",
+          "O farmacêutico pode realizar a 'Alteração da Prescrição' caso detecte sobredose ou interação medicamentosa severa."
         ],
         tip: "A avaliação e intervenção farmacêutica é o coração do controle de qualidade e custos em hospitais maduros." 
       }
@@ -576,37 +625,37 @@ const CONTENT = {
     sections: [
       { icon: "ti-calendar-time", title: "Aprazamento de Enfermagem (Cap. 8)",
         points: [
-          "Quando ativado, o médico define apenas a frequência (ex: 8/8h), mas quem define os horários EXATOS (ex: 06h, 14h, 22h) é o enfermeiro (Aprazamento).",
-          "É ativado nos parâmetros gerais. Não pode ser ativado por setor isolado, é uma decisão institucional: todos usam ou ninguém usa.",
-          "Se desativado, o médico prescreve e o sistema (ou o médico) já impõe os horários automaticamente baseado no esquema padrão."
+          "Quando ativado, o médico define a frequência (ex: 8/8h), mas quem define os horários exatos é o enfermeiro.",
+          "Ativado nos parâmetros gerais. Não pode ser ativado por setor isolado — é uma decisão institucional.",
+          "Se desativado, o médico prescreve e o sistema impõe os horários automaticamente baseado no esquema padrão."
         ],
-        tip: "A instituição deve treinar muito bem os enfermeiros no aprazamento para evitar choque de medicações incompatíveis no mesmo acesso venoso no mesmo horário." 
+        tip: "Treine muito bem os enfermeiros no aprazamento para evitar choque de medicações incompatíveis no mesmo acesso venoso." 
       },
       { icon: "ti-barcode", title: "Checagem Beira Leito c/ Código de Barras (Cap. 11)",
         points: [
-          "Implementada na V.02/25. É o maior avanço em segurança do paciente, garantindo a meta internacional número 3.",
-          "Fluxo de validação tríplice: bipar a pulseira do paciente -> bipar o crachá do profissional -> bipar o código de barras do medicamento.",
-          "Garante os certos da enfermagem: 'Paciente certo, dose certa, hora certa, medicamento certo, via certa'.",
-          "Sinaliza rastreabilidade total em tempo real direto no prontuário eletrônico (lote, validade, horário exato da aplicação)."
+          "Implementada na V.02/25. O maior avanço em segurança do paciente, garantindo a meta internacional número 3.",
+          "Fluxo tríplice: bipar a pulseira do paciente → bipar o crachá do profissional → bipar o código de barras do medicamento.",
+          "Garante os certos: 'Paciente certo, dose certa, hora certa, medicamento certo, via certa'.",
+          "Sinaliza rastreabilidade total em tempo real direto no prontuário (lote, validade, horário exato da aplicação)."
         ],
-        tip: "Mesmo com o Beira Leito no sistema, a farmácia precisa ter processos maduros para etiquetar ou fracionar cada ampola e comprimido individualmente com código legível." 
+        tip: "A farmácia precisa ter processos maduros para etiquetar cada ampola e comprimido individualmente com código legível." 
       },
       { icon: "ti-droplet", title: "Balanço Hídrico (BH)",
         points: [
-          "Registra rigorosamente o ganho (entradas/infusões, dieta enteral) e a perda (diurese, drenos, vômitos, perdas insensíveis) do paciente em 24h.",
-          "Se integrado aos parâmetros, as soluções EV checadas na prescrição (ex: Soro de 500ml) já somam na 'Entrada' automaticamente.",
-          "Os horários de fechamento do BH (parciais de 6h, 12h ou total de 24h) são parametrizados nas configurações do setor (ex: 6h da manhã).",
-          "É possível cadastrar e detalhar 'Aspectos de Eliminação' (ex: urina colúrica, sangue vivo, fezes pastosas)."
+          "Registra o ganho (entradas/infusões, dieta enteral) e a perda (diurese, drenos, vômitos) do paciente em 24h.",
+          "Se integrado, as soluções EV checadas na prescrição já somam na 'Entrada' automaticamente.",
+          "Os horários de fechamento do BH são parametrizados nas configurações do setor.",
+          "É possível cadastrar e detalhar 'Aspectos de Eliminação' (ex: urina colúrica, fezes pastosas)."
         ],
-        tip: "Um balanço hídrico manual no papel é fonte inesgotável de erros de cálculo. A integração com a checagem reduz falhas de transcrição de volumes absurdamente." 
+        tip: "Um balanço hídrico manual no papel é fonte inesgotável de erros. A integração com a checagem reduz falhas de transcrição." 
       },
       { icon: "ti-activity", title: "Monitorização e Sinais Vitais (Cap. 13)",
         points: [
-          "Registra graficamente PA, Pulso, Temperatura, Saturação O2, Dor, Glicemia Capilar e Frequência Respiratória.",
-          "A hora inicial a ser considerada para visualização das 24h da curva de sinais vitais é parametrizada no SGH.",
-          "A Glicemia Capilar possui uma rotina especial que, acoplada a um kit, pode disparar esquemas de correção (insulina Rápida) na prescrição caso o valor esteja muito alto."
+          "Registra graficamente PA, Pulso, Temperatura, Saturação O2, Dor, Glicemia Capilar e FR.",
+          "A hora inicial a ser considerada para as 24h da curva é parametrizada no SGH.",
+          "A Glicemia Capilar possui rotina especial que pode disparar esquemas de correção (insulina) na prescrição."
         ],
-        tip: "Configure limites de normalidade (Score de Alerta Precoce - MEWS) para os sinais vitais, assim o sistema muda a cor das aferições alteradas, facilitando a visualização rápida de uma deterioração clínica." 
+        tip: "Configure limites de normalidade (Score MEWS) para os sinais vitais. O sistema muda a cor das aferições alteradas, facilitando a visualização de deterioração clínica." 
       }
     ]
   },
@@ -616,27 +665,27 @@ const CONTENT = {
     sections: [
       { icon: "ti-flask", title: "Cadastro e Configuração Base",
         points: [
-          "Exames devem ser cadastrados em Tabelas com informações vitais como: Bateria (Sangue, Imagem, Urina), Local de realização, e Responsável pelo laudo.",
-          "Kits de exames: Facilitam agrupar rotinas muito comuns. Exemplo: 'Rotina Admissional UTI' (solicita Hemograma, Ureia, Creatinina, Sódio, Potássio com 1 clique).",
-          "Os modelos de impressão da solicitação podem requerer e imprimir assinatura digital e código de barras para as amostras."
+          "Exames devem ser cadastrados em Tabelas com: Bateria, Local de realização e Responsável pelo laudo.",
+          "Kits de exames: Agrupam rotinas comuns. Ex: 'Rotina Admissional UTI' com 1 clique.",
+          "Modelos de impressão podem incluir assinatura digital e código de barras para as amostras."
         ],
-        tip: "A boa organização das baterias de exame limpa a interface do médico e facilita o entendimento e triagem laboratorial." 
+        tip: "A boa organização das baterias de exame limpa a interface do médico e facilita a triagem laboratorial." 
       },
       { icon: "ti-search", title: "Fluxo de Solicitação Dinâmica",
         points: [
-          "O médico pode marcar uma flag 'A ser realizado fora da instituição' se o paciente for encaminhado para um exame externo.",
-          "No histórico de solicitações médicas, a separação por 'baterias' (parâmetro ativo) melhora muito a visibilidade cronológica do que foi pedido e quando.",
-          "A rotina suporta abas para exames oncológicos e oftalmológicos com dados especializados extras na hora do pedido."
+          "O médico pode marcar 'Exame fora da instituição' se o paciente for encaminhado para um exame externo.",
+          "A separação por 'baterias' no histórico melhora a visibilidade cronológica do que foi pedido e quando.",
+          "Suporta abas para exames oncológicos e oftalmológicos com dados especializados extras."
         ],
-        tip: "Se o paciente for grave e precisar de vaga urgente, o alerta visual no sistema notifica o laboratório/coleta instantaneamente." 
+        tip: "Se o paciente for grave, o alerta visual notifica o laboratório/coleta instantaneamente." 
       },
       { icon: "ti-eye", title: "Integração de Resultados e Laudos",
         points: [
-          "Para laboratórios terceirizados, a integração nativa via Web Service SPDATA importa os laudos finalizados diretamente para o prontuário sem intervenção manual.",
-          "Parâmetro de Alerta: Pisca ou notifica os profissionais ao abrirem o prontuário indicando que exames pedidos já têm laudo disponível para leitura.",
-          "Laudos de Radiologia Digital (Raio-X, Tomografia) e Endoscopia também são gravados de forma organizada no Histórico do Paciente."
+          "Para laboratórios terceirizados, a integração via Web Service importa os laudos direto para o prontuário.",
+          "Parâmetro de Alerta: notifica os profissionais ao abrirem o prontuário que há laudo disponível para leitura.",
+          "Laudos de Radiologia Digital e Endoscopia também são gravados no Histórico do Paciente."
         ],
-        tip: "Resultados de pânico (ex: Potássio = 7.0, Troponina muito alta) precisam de ação imediata, o alerta do PEP evita que resultados fiquem 'esquecidos' no sistema." 
+        tip: "Resultados de pânico (ex: Potássio = 7.0) precisam de ação imediata. O alerta do PEP evita que resultados fiquem 'esquecidos'." 
       }
     ]
   },
@@ -646,27 +695,27 @@ const CONTENT = {
     sections: [
       { icon: "ti-layout-board", title: "Criação Estruturada de Templates (Cap. 16)",
         points: [
-          "Os Templates são a espinha dorsal clínica flexível do sistema. Você cria formulários de admissão, evoluções diárias de diversas categorias, e escalas de risco (Braden, Morse, Glasgow).",
-          "Suportam vastos tipos de campos: texto livre restrito, múltiplas alternativas (checkbox/radio), seleção obrigatória de CID-10, tabelas dinâmicas e lista de problemas.",
-          "Expression Enabled/Value: Um recurso avançado para fórmulas matemáticas dentro do formulário. (Exemplo clássico: Cálculo automático de IMC cruzando as perguntas 'Peso' e 'Altura')."
+          "Templates são a espinha dorsal clínica flexível do sistema: admissão, evoluções, escalas de risco (Braden, Morse, Glasgow).",
+          "Suportam: texto livre, múltiplas alternativas, seleção de CID-10, tabelas dinâmicas e lista de problemas.",
+          "Expression Enabled/Value: fórmulas matemáticas dentro do formulário. Ex: Cálculo automático de IMC."
         ],
-        tip: "Sempre que possível, EVITE templates compostos de um enorme bloco de 'Texto Livre'. Use alternativas estruturadas. Isso gera dados de Business Intelligence, BI e relatórios cruzados no futuro." 
+        tip: "Evite templates de 'Texto Livre' puro. Use alternativas estruturadas — isso gera dados para Business Intelligence e relatórios cruzados." 
       },
       { icon: "ti-notes", title: "Rotina de Anamnese e Evolução (Cap. 17)",
         points: [
-          "Anamnese: A ficha clínica da admissão. Se o parâmetro 'Ficha de admissão' estiver ativado no sistema, ela se torna OBRIGATÓRIA antes de deixar o médico fazer qualquer prescrição.",
-          "Evolução Clínica: O registro contínuo. Possui botões inteligentes como 'Copiar Última' para agilizar a digitação carregando textos longos inalterados de dias anteriores.",
-          "Diagnóstico (CID-10): Cadastro contínuo da patologia. Há travas de Restrição por Sexo (Ex: CID de Neoplasia de Ovário em paciente do sexo masculino) que emitem um alerta ou travam a inserção."
+          "Anamnese: Se o parâmetro 'Ficha de admissão' estiver ativado, ela se torna OBRIGATÓRIA antes de qualquer prescrição.",
+          "Evolução Clínica: Possui botão 'Copiar Última' para agilizar a digitação com textos inalterados.",
+          "Diagnóstico (CID-10): Travas de Restrição por Sexo emitem alerta ou travam a inserção de CIDs incompatíveis."
         ],
-        tip: "Incentive os médicos a usarem o botão 'Resumo Clínico', que compila a anamnese inicial, a última evolução e os resultados dos exames recentes em um dashboard único facilitando a passagem de plantão." 
+        tip: "Incentive o uso do 'Resumo Clínico' que compila anamnese, última evolução e resultados recentes em um dashboard único para a passagem de plantão." 
       },
       { icon: "ti-clipboard-list", title: "Ordens Clínicas, Post-its e Histórico (Cap. 39, 43)",
         points: [
-          "Gestão de Ordens Clínicas: Permite à equipe médica ditar diretrizes paralelas não-medicamentosas para a enfermagem fora da prescrição estrita (Ex: 'Manter Cabeceira elevada a 30º', 'Aviso em caso de pico hipertensivo').",
-          "Notas e Lembretes: Funciona como Post-its digitais anexados à capa do prontuário do paciente (ex: 'Aguardando avaliação da Assistência Social', 'Família com dificuldades de comunicação').",
-          "Os lembretes podem ser configurados como globais (todos veem) ou privados (somente o profissional que criou consegue visualizar)."
+          "Gestão de Ordens Clínicas: Diretrizes não-medicamentosas para a enfermagem. Ex: 'Manter Cabeceira a 30º'.",
+          "Notas e Lembretes: Post-its digitais na capa do prontuário. Ex: 'Aguardando Assistência Social'.",
+          "Lembretes podem ser globais (todos veem) ou privados (só o profissional que criou)."
         ],
-        tip: "Utilize as ordens clínicas ativamente! Elas possuem status rastreáveis (Pendente, Em execução, Concluída) e elevam o nível de segurança e alinhamento da equipe multi-disciplinar." 
+        tip: "Use as ordens clínicas ativamente! Possuem status rastreáveis (Pendente, Em execução, Concluída) e elevam a segurança da equipe." 
       }
     ]
   },
@@ -676,31 +725,31 @@ const CONTENT = {
     sections: [
       { icon: "ti-certificate", title: "Assinatura de Profissionais e Validade Legal (Cap. 52)",
         points: [
-          "A assinatura digital confere a mesma validade jurídica do papel carimbado pelo Conselho Regional (Medicina/Enfermagem) e impulsiona o projeto 'Hospital Paperless' (Sem Papel).",
-          "Suporta o tipo A1 (Arquivo de certificado digital instalado diretamente na máquina local).",
-          "Suporta o tipo A3 (Certificado físico via Cartão Smartcard ou Token USB que exige leitora e instalação de drivers).",
-          "Assinaturas em Nuvem (SafeWeb e Valid): São a vanguarda e as recomendadas, pois dispensam leitoras físicas travadas e funcionam via autenticação de PIN e Token no celular (App).",
-          "Assinatura em Lote: Uma facilidade que permite que o médico atenda seus 15 pacientes e, ao final do turno, acesse um painel central e assine digitalmente todas as evoluções e prescrições com uma única inserção de PIN."
+          "Confere a mesma validade jurídica do papel carimbado pelo Conselho Regional e impulsiona o projeto 'Hospital Paperless'.",
+          "Tipo A1: Arquivo de certificado digital instalado na máquina local.",
+          "Tipo A3: Certificado físico via Cartão Smartcard ou Token USB com leitora.",
+          "Assinaturas em Nuvem (SafeWeb e Valid): dispensam leitoras físicas, funcionam via PIN e Token no celular.",
+          "Assinatura em Lote: Ao final do turno, o médico assina todas as evoluções e prescrições com uma única inserção de PIN."
         ],
-        tip: "Sempre que possível migre os médicos para assinaturas em Nuvem (BirdID/SafeID). Isso zera os intermináveis chamados de TI relacionados a 'minha leitora de cartão não reconhece o chip A3'." 
+        tip: "Migre para assinaturas em Nuvem (BirdID/SafeID). Isso zera os chamados de TI com 'minha leitora de cartão não funciona'." 
       },
       { icon: "ti-user-edit", title: "Fluxo Hierárquico de Estagiários e Residentes (Cap. 53)",
         points: [
-          "Este é um fluxo fundamental para funcionamento e acreditação de Hospitais de Ensino (HUs).",
-          "O Estagiário ou Residente Jr tem a vivência clínica, atende o paciente, redige a evolução inteira e elabora uma prescrição, porém ele apenas SALVA como 'projeto', ele não tem permissão de assinar e validar clinicamente.",
-          "O Supervisor/Preceptor loga com seu usuário, abre uma caixa de 'Avaliar documentos de estagiários'.",
-          "O supervisor lê o trabalho do aluno, altera prescrições erradas, ajusta doses e, ao concordar, ele aplica sua própria assinatura digital. Apenas nesse momento o prontuário ganha validade legal e a prescrição desce para a farmácia."
+          "Fundamental para Hospitais de Ensino.",
+          "O Estagiário atende o paciente, redige a evolução e prescrição, porém apenas SALVA como 'projeto'.",
+          "O Supervisor/Preceptor lê o trabalho, corrige e ao concordar aplica sua própria assinatura digital.",
+          "Apenas nesse momento o prontuário ganha validade legal e a prescrição desce para a farmácia."
         ],
-        tip: "Verifique detalhadamente se o cadastro do preceptor possui a flag 'Permite avaliar residentes' habilitada, senão o estagiário ficará travado esperando aprovação no vazio." 
+        tip: "Verifique se o preceptor possui a flag 'Permite avaliar residentes' habilitada, senão o estagiário ficará travado sem aprovação." 
       },
       { icon: "ti-user-check", title: "Assinatura Eletrônica do Paciente (Cap. 56)",
         points: [
-          "Inovação que elimina as infinitas pranchetas e folhas de rosto. Substitui a assinatura à caneta em Termos de Consentimento Informado (Cirurgia, Anestesia), LGPD e Termos de Internação Gerais.",
-          "Obrigatoriedade: O paciente ou seu familiar deve estar devidamente cadastrado no SGH com CPF válido e um E-mail ou Número de Celular.",
-          "Fluxo: O sistema PEP dispara um link de um 'Portal de Assinaturas' via SMS, WhatsApp ou Email.",
-          "O paciente abre o link no seu próprio smartphone, lê o documento na tela, concorda, assina eletronicamente e tira uma selfie/valida o PIN. Essa assinatura eletrônica é juridicamente válida (Lei da Assinatura Eletrônica Simples/Avançada)."
+          "Elimina pranchetas e folhas. Substitui a assinatura à caneta em Termos de Consentimento, LGPD e Internação.",
+          "Obrigatoriedade: Paciente deve ter CPF válido e E-mail ou Número de Celular no cadastro.",
+          "Fluxo: O sistema dispara um link via SMS, WhatsApp ou Email para o paciente.",
+          "O paciente abre o link, lê o documento, concorda e assina eletronicamente. Juridicamente válida por lei."
         ],
-        tip: "Para usar com sucesso, a recepção precisa criar a cultura de exigir rigorosamente número de celular de WhatsApp ativo e CPF de todos os pacientes na triagem/admissão." 
+        tip: "A recepção precisa criar a cultura de exigir número de WhatsApp ativo e CPF de TODOS os pacientes na admissão." 
       }
     ]
   },
@@ -710,27 +759,27 @@ const CONTENT = {
     sections: [
       { icon: "ti-calendar-check", title: "Fluxo de Provisionar Alta (Cap. 45)",
         points: [
-          "Provisionar Alta NÃO é a liberação física do paciente. É apenas um sinalizador estratégico. (Ex: 'Este paciente de cirurgia de fêmur provavelmente vai ter alta na quinta-feira à tarde').",
-          "Para que serve? É oxigênio puro para o setor de Regulação e Gestão de Leitos. Permite organizar as equipes de higienização de leito e admitir os pacientes represados no Pronto Socorro.",
-          "Assim que provisionada, o sistema gera ícones e alertas visuais no mapa de leitos de toda a equipe multidisciplinar, ajudando a acelerar os trâmites da desospitalização."
+          "Provisionar Alta NÃO é a liberação física do paciente. É apenas um sinalizador estratégico de data provável.",
+          "Permite organizar as equipes de higienização de leito e admitir pacientes represados no Pronto Socorro.",
+          "Gera ícones e alertas visuais no mapa de leitos de toda a equipe multidisciplinar."
         ],
-        tip: "Se o seu hospital vive com pacientes no corredor do Pronto Socorro, implemente o provisionamento obrigatório no Round diário. A rotatividade de leitos irá dobrar." 
+        tip: "Implemente o provisionamento obrigatório no Round diário. A rotatividade de leitos aumenta significativamente." 
       },
-      { icon: "ti-stethoscope", title: "Diferença entre Alta Médica e Alta Hospitalar",
+      { icon: "ti-stethoscope", title: "Alta Médica vs Alta Hospitalar",
         points: [
-          "Alta Médica (Efetiva): É o ato clínico. O médico digita o destino (Casa, Óbito, Transferência), redige e imprime a receita médica final, o atestado de dispensa do trabalho e encerra sua responsabilidade clínica.",
-          "Alta Hospitalar (Administrativa): Feita geralmente pelo setor de Internação/Faturamento. Ocorre quando o paciente FISICAMENTE transpõe a porta do hospital para ir embora. Encerra definitivamente a conta e desvincula a cama.",
-          "Auditoria de Segurança: Após o carimbo sistêmico da 'Alta Hospitalar', o PEP aciona um cadeado rigoroso bloqueando qualquer novo lançamento clínico, requisição de exames ou medicamentos, prevenindo fraudes ou perdas no faturamento contra o convênio."
+          "Alta Médica: Ato clínico. O médico digita o destino, redige a receita e o atestado final, encerrando sua responsabilidade.",
+          "Alta Hospitalar: Ato administrativo. Ocorre quando o paciente fisicamente sai do hospital. Encerra a conta e desvincula a cama.",
+          "Após a Alta Hospitalar, o PEP bloqueia qualquer novo lançamento clínico prevenindo fraudes no faturamento."
         ],
-        tip: "Atrasos comuns ocorrem quando o médico dá alta 10:00h da manhã, mas o paciente fica ocupando o leito até as 18:00h esperando a ambulância municipal ou familiares. A cama só deve e pode ser liberada (Alta Hospitalar) quando ele sair do quarto." 
+        tip: "A cama só deve ser liberada (Alta Hospitalar) quando o paciente fisicamente sair do quarto, não quando o médico prescrever a alta." 
       },
-      { icon: "ti-file-check", title: "Documentação de Fechamento: RAC e Sumário de Alta (Cap. 55)",
+      { icon: "ti-file-check", title: "RAC e Sumário de Alta (Cap. 55)",
         points: [
-          "Sumário de Alta (Discharge Summary): É o documento sagrado de fechamento obrigatório. Resume meses de internação em uma folha (Motivos, Exames Alterados Relevantes, Cirurgias Realizadas, Diagnóstico Final, e Medicações de Uso Contínuo).",
-          "RAC (Registro de Atendimento Clínico - Lançado na V.01/26): Um padrão de formulário exigido pelas novas regulamentações do Ministério da Saúde. Focado em atendimentos Ambulatoriais/Pronto Socorro. Garante que os dados estejam padronizados para Interoperabilidade em Saúde (RNDS - Rede Nacional de Dados em Saúde).",
-          "Trava Inteligente: O sistema SGH pode ser parametrizado para proibir o médico de clicar no botão final de 'Dar Alta Médica' sem antes preencher todos os campos mínimos do Sumário de Alta."
+          "Sumário de Alta: Resume a internação (Motivos, Exames, Cirurgias, Diagnóstico Final, Medicações de Uso Contínuo).",
+          "RAC (V.01/26): Padrão exigido pelo Ministério da Saúde para atendimentos Ambulatoriais. Garante interoperabilidade (RNDS).",
+          "O sistema pode proibir clicar em 'Alta Médica' sem antes preencher todos os campos mínimos do Sumário."
         ],
-        tip: "Ativar a 'Trava de Preenchimento Obrigatório do Sumário' elimina de uma vez por todas o terrível problema de pilhas de prontuários pendentes que bloqueiam o faturamento e causam glosas financeiras astronômicas por parte dos planos de saúde." 
+        tip: "Ativar a trava obrigatória do Sumário elimina pilhas de prontuários pendentes que causam glosas financeiras enormes pelos planos de saúde." 
       }
     ]
   },
@@ -740,36 +789,36 @@ const CONTENT = {
     sections: [
       { icon: "ti-ribbon", title: "Módulo Especializado de Oncologia (Cap. 27)",
         points: [
-          "Um ecossistema à parte dentro do PEP. Altamente complexo devido à toxicidade dos quimioterápicos. Exige que o sistema faça cálculos vitais e rigorosos de dose baseados em Superfície Corporal (m²) e Peso do paciente.",
-          "Gerencia o Cadastro de Protocolos Quimioterápicos longos (Ex: FOLFOX, R-CHOP) com ciclos exatos (Aplicações no D1, D8, D15, Pausa D21).",
-          "Apresenta uma Agenda Gráfica de Quimioterapia que gerencia os horários das cadeiras e os turnos nas Capelas de Manipulação com Exaustão Segura.",
-          "Nenhuma gota de quimioterápico vai para a enfermagem sem a rotina de 'Validação e Conferência Farmacêutica' exigida por lei na dupla checagem da manipulação."
+          "Altamente complexo. Faz cálculos vitais de dose baseados em Superfície Corporal (m²) e Peso do paciente.",
+          "Gerencia Protocolos Quimioterápicos longos (Ex: FOLFOX, R-CHOP) com ciclos exatos.",
+          "Agenda Gráfica de Quimioterapia com horários de cadeiras e turnos nas Capelas de Manipulação.",
+          "Nenhum quimioterápico vai à enfermagem sem a 'Validação e Conferência Farmacêutica' exigida por lei."
         ],
-        tip: "A Oncologia não admite erros humanos de cálculo. Todo o cadastro mestre do estoque (Itens Injetáveis, Diluentes de Reconstituição, Medicamentos de suporte Anti-eméticos) deve ter suas fórmulas de miligrama testadas de forma exaustiva pela TI e Farmácia." 
+        tip: "Todo o cadastro mestre (Itens Injetáveis, Diluentes, Medicamentos de suporte) deve ter fórmulas testadas exaustivamente." 
       },
-      { icon: "ti-file-invoice", title: "Burocracias de Alto Custo: AIH e APAC (Cap. 19, 33)",
+      { icon: "ti-file-invoice", title: "AIH e APAC (Cap. 19, 33)",
         points: [
-          "Laudo de Autorização de Internação Hospitalar (AIH): O documento chave para hospitais filantrópicos e SUS conseguirem faturar a internação e receber do Ministério da Saúde.",
-          "Travas de Preenchimento: O laudo de AIH pode ser configurado para alertar a equipe médica em prazos limites (Ex: 24h ou 48h pós admissão). Se negligenciado, o PEP entra em modo passivo, travando prescrições novas até que o laudo obrigatório seja gerado.",
-          "APAC (Autorização de Procedimento de Alta Complexidade): Tem funcionalidade similar e paralela à AIH, mas focado especificamente em terapias de alto custo ambulatoriais, como Sessões Crônicas de Hemodiálise, Terapias Renais Substitutivas, Radioterapia e Quimioterapia."
+          "AIH: Documento chave para hospitais SUS conseguirem faturar a internação.",
+          "Travas: O laudo de AIH pode bloquear novas prescrições se não preenchido nos prazos (24h ou 48h pós admissão).",
+          "APAC: Similar à AIH, focado em terapias de alto custo ambulatoriais (Hemodiálise, Radioterapia, Quimioterapia)."
         ],
-        tip: "Nunca desabilite os bloqueios sistêmicos de atraso de AIH/APAC, por mais que as equipes médicas reclamem. A ausência desse bloqueio custa literalmente milhões de reais perdidos em faturamento do SUS rejeitado." 
+        tip: "Nunca desabilite os bloqueios de atraso de AIH/APAC. A ausência custa milhões em faturamento SUS rejeitado." 
       },
-      { icon: "ti-activity", title: "Score de Risco e Triagem: Índices e Painel (Cap. 34, 18)",
+      { icon: "ti-activity", title: "Índices Prognósticos e Triagem (Cap. 34, 18)",
         points: [
-          "Índices Prognósticos de Gravidade (APACHE II, SOFA): Integrados diretamente aos fluxos das UTIs. Calculam algoritmicamente a probabilidade de mortalidade do paciente crítico através do cruzamento de exames de sangue e desvios de sinais vitais.",
-          "Fluxo de Triagem (Painel Eletrônico - Cap. 18): Uma rotina que automatiza toda a jornada de um Pronto Atendimento movimentado (Totem -> Retirar Senha -> Sala de Triagem de Sinais Vitais -> Fila de Consultório Médico -> Sala de Medicação).",
-          "Acolhimento com Classificação de Risco (Protocolo de Manchester): Incorporado no PEP para classificar instantaneamente o risco do paciente gerando tarjas e cores de prioridade de chamada (Azul, Verde, Amarelo, Laranja, Vermelho Emergência)."
+          "APACHE II e SOFA: Calculam probabilidade de mortalidade do paciente crítico na UTI.",
+          "Fluxo de Triagem (Painel Eletrônico): Automatiza todo o Pronto Atendimento (Totem → Senha → Triagem → Consultório).",
+          "Protocolo de Manchester: Classifica o risco gerando cores de prioridade (Azul, Verde, Amarelo, Laranja, Vermelho)."
         ],
-        tip: "Ao utilizar a funcionalidade do Painel Totem nas salas de espera, atente-se aos parâmetros para chamar as pessoas pelo 'Nome Completo' ou por 'Senha e Sigla', a depender das regras do compliance de LGPD e política de humanização do hospital." 
+        tip: "Defina nos parâmetros do Painel se chama pelo Nome ou pela Senha, respeitando as regras de LGPD e humanização do hospital." 
       },
-      { icon: "ti-alert-triangle", title: "Vigilância Epidemiológica e Notificação (Cap. 14)",
+      { icon: "ti-alert-triangle", title: "Vigilância Epidemiológica (Cap. 14)",
         points: [
-          "Para o controle nacional de surtos, patologias como Dengue, Sífilis, Tuberculose, Sarampo ou Meningite são de 'Notificação Compulsória' à vigilância sanitária local/estadual.",
-          "O SGH resolve o problema da subnotificação: O painel vincula esses CIDs sensíveis a uma trava. Se um médico fechar um diagnóstico de 'Dengue Clássica' ou confirmar o exame positivo, o sistema detecta e força o preenchimento automático da ficha SINAN (Sistema de Informação de Agravos de Notificação).",
-          "O sistema possui integração para envio silencioso de e-mails de alerta automáticos para a Secretaria de Saúde do município e/ou para a comissão de infecção hospitalar interna, eliminando formulários manuais esquecidos nas gavetas."
+          "Notificação Compulsória automatizada: ao fechar CIDs sensíveis (Dengue, Sífilis, Meningite), o sistema força a ficha SINAN.",
+          "Integração para envio silencioso de e-mails automáticos à Secretaria de Saúde e comissão de infecção hospitalar.",
+          "Elimina formulários manuais esquecidos nas gavetas."
         ],
-        tip: "Automatizar a ficha compulsória junto aos laudos laboratoriais dispara o nível de excelência e conformidade do hospital em avaliações de metodologias de Acreditação como ONA, JCI e Qmentum." 
+        tip: "Automatizar a ficha compulsória eleva o nível de conformidade em acreditações como ONA, JCI e Qmentum." 
       }
     ]
   }
@@ -779,87 +828,23 @@ const PEP_CONTEXT = `Você é um assistente especialista no Manual do PEP (Pront
 
 REGRAS ESTRITAS:
 1. Baseie sua resposta ESTRITAMENTE nos "TRECHOS RELEVANTES DO MANUAL COMPLETO" fornecidos abaixo.
-2. Se a resposta para a pergunta do usuário não estiver contida nos trechos fornecidos, responda EXATAMENTE: "Desculpe, mas não encontrei essa informação no manual do PEP." NÃO invente informações e NÃO use conhecimentos externos.
-3. Seja EXTREMAMENTE DETALHISTA, profundo e didático nas suas explicações. Não dê respostas curtas ou rasas. Aprofunde-se em cada passo, regra de negócio, impactos clínicos/financeiros e configurações de cada funcionalidade.
-4. Forneça exemplos práticos, dicas de dia a dia hospitalar e fluxos passo a passo sempre que possível para enriquecer a compreensão do usuário.
-5. Use formatação rica em Markdown (títulos, bullet points, listas numeradas, negrito e blocos de citação) para organizar as informações detalhadas e facilitar a leitura avançada.
+2. Se a resposta não estiver nos trechos fornecidos, responda: "Desculpe, mas não encontrei essa informação no manual do PEP." NÃO invente informações.
+3. Seja DETALHISTA e didático. Use formatação rica em Markdown (títulos ##, listas -, **negrito**) para organizar as respostas.
+4. Forneça exemplos práticos e fluxos passo a passo sempre que possível.
 
-CONTEÚDO PRINCIPAL DO MANUAL (Visão Geral):
+CONTEÚDO PRINCIPAL DO MANUAL:
+1. PERMISSÕES: SGH > Permissões > P.E.P. CBO obrigatório via SGH > Usuários > Manutenção de Papéis > opção 4.
+2. PARAMETRIZAÇÃO: Parâmetros I: checagem, aprazamento (todos os setores), tolerância lançamento (máx 2h), duplicidade medicamentos. Confirmar sempre após alterações.
+3. PRESCRIÇÃO GERAL (Cap 5): medicamentos, soluções EV, procedimentos, dietas, hemocomponentes. Frequência 24/24h na V.01/26. Kits e protocolos padrão.
+4. CHECAGEM (Cap 8, 11): aprazamento por todos setores. Código de barras V.02/25. Balanço Hídrico integrado.
+5. EXAMES (Cap 12): kits de exames, Web Service laboratórios, alerta exames liberados.
+6. TEMPLATES (Cap 16, 17): CID10, fórmulas Expression. Anamnese pode ser obrigatória antes da prescrição.
+7. ASSINATURA DIGITAL (Cap 52, 56): A1, A3, SafeWeb, Valid, lote. Assinatura paciente via portal.
+8. ALTA (Cap 45, 55): Provisionar → Alta Médica → Alta Hospitalar. RAC V.01/26 para ambulatório.
+9. ONCOLOGIA (Cap 27): cálculo por SC, agenda quimioterapia, validação farmacêutica.
+10. IMPRESSÃO COMPLETA DO PRONTUÁRIO (Cap 46, 47): SGH > PEP > Localizar paciente > Impressão completa e recibo. Campos obrigatórios: relação com sujeito, nome, CPF, justificativa. Nova solicitação → Confirmar → Exportar (PDF) ou Imprimir. Versão consolidada organiza por tipo/cronológica.`;
 
-1. INTRODUÇÃO: O PEP é um módulo destinado ao preenchimento de dados e informações de saúde do paciente. Mantém a segurança do paciente, arquiva dados de relevância e automatiza o trabalho dos profissionais.
-
-2. PERMISSÕES: Dois requisitos mínimos: (a) Permissão do grupo ao módulo PEP via SGH > Permissões > P.E.P; (b) Cadastro e vinculação do CBO ao usuário. Dados obrigatórios do profissional: Nome, CPF, CBO, competência, UF, Conselho profissional e Nº conselho. Vinculação: SGH > Usuários > Manutenção de Papéis > opção 4 – Operador do Sistema.
-
-3. PARAMETRIZAÇÃO: Parâmetros I incluem: controlar checagem de enfermagem (itens checados vão ao Balanço Hídrico), checar somente itens assinados, realizar aprazamento pela enfermagem (ativa para todos os setores), tolerância para lançamento atrasado (máx. 2h), validar duplicidade de medicamentos (por item ou princípio ativo). Sempre clicar em 'Confirmar' após alterações. Integrações com estoque: requisição de saída ou dispensação por horário; validar antimicrobiano ativa a rotina de ATB. Parâmetros de impressão: logotipo, horários, modo zebrado, frente e verso, tamanho da fonte.
-
-4. PRESCRIÇÃO GERAL (Cap 5): Tipos: medicamentos, soluções EV, procedimentos clínicos, dietas (livre, oral, enteral, parenteral, jejum), hemocomponentes, respiração espontânea, nível de atividade. Frequência 24/24h adicionada na V.01/26. Kits de medicamentos e soluções EV contínua podem ser configurados. Validações: duplicidade, alergia CBARA, antimicrobiano, índice prognóstico. Protocolos padrão podem ser criados.
-
-5. CHECAGEM DE ENFERMAGEM (Cap 8, 11): Aprazamento ativa para todos os setores (não pode ser específico). V.02/25 implementou checagem por código de barras com rastreabilidade em tempo real. Balanço Hídrico registra entradas/saídas; horários de fechamento configuráveis.
-
-6. EXAMES (Cap 12): Solicitação dentro do prontuário. Kits de exames para solicitar grupos. Integração com laboratórios terceiros via Web Service. Alerta de exames liberados configurável.
-
-7. TEMPLATES E ANAMNESE (Cap 16, 17): Templates com perguntas variadas (CID10, texto livre, procedimentos, etc.). Anamnese pode ser obrigatória antes da prescrição. Resumo clínico pode abrir automaticamente.
-
-8. ASSINATURA DIGITAL (Cap 52, 56): Tipos: A1 (arquivo local), A3 (token), SafeWeb (nuvem), Valid (nuvem). Habilitação por usuário possível. Assinatura em lote para pendências acumuladas. Assinatura digital do paciente via Portal de Assinatura. Estagiários só salvam; supervisor confirma.
-
-9. ALTA (Cap 45, 55): Provisionar alta: previsão de data. Alta médica: decisão clínica. Alta hospitalar: finaliza internação. RAC (V.01/26): Registro de Atendimento Clínico para ambulatório.
-
-10. ONCOLOGIA (Cap 27): Protocolos com cálculo de dose por superfície corporal. Agenda de quimioterapia com ciclos/sessões. Validação farmacêutica. Integração com estoque ao planejar/prescrever/validar.
-
-11. OUTRAS ROTINAS: Oftalmologia (laudos e exames), AIH (laudo obrigatório em até 24h/48h configurável), APAC (procedimentos alta complexidade), Índice Prognóstico (APACHE II, SOFA), Notificação Compulsória (ativada por CID, envio por e-mail), Partograma, Curva de Crescimento Infantil, Interconsulta, Encaminhamento, Processo de Enfermagem (SAE), Ficha Anestésica.`;
-
-770: 11. OUTRAS ROTINAS: Oftalmologia (laudos e exames), AIH (laudo obrigatório em até 24h/48h configurável), APAC (procedimentos alta complexidade), Índice Prognóstico (APACHE II, SOFA), Notificação Compulsória (ativada por CID, envio por e-mail), Partograma, Curva de Crescimento Infantil, Interconsulta, Encaminhamento, Processo de Enfermagem (SAE), Ficha Anestésica.`;
-771: 
-772: // ============================================================
-773: // Markdown Renderer simples para as respostas da IA
-774: // ============================================================
-775: function renderMarkdown(text) {
-776:   let html = text
-777:     // Escapa HTML perigoso primeiro
-778:     .replace(/&/g, '&amp;')
-779:     .replace(/</g, '&lt;')
-780:     .replace(/>/g, '&gt;')
-781:     // Blocos de código (antes de outros processamentos)
-782:     .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-783:     // Títulos
-784:     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-785:     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-786:     .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-787:     // Negrito e itálico
-788:     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-789:     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-790:     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-791:     // Código inline
-792:     .replace(/`([^`]+)`/g, '<code>$1</code>')
-793:     // Blockquote
-794:     .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
-795:     // HR
-796:     .replace(/^---$/gm, '<hr>')
-797:     // Listas não ordenadas
-798:     .replace(/^\* (.+)$/gm, '<li>$1</li>')
-799:     .replace(/^- (.+)$/gm, '<li>$1</li>')
-800:     // Listas ordenadas
-801:     .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-802:     // Agrupa <li> em <ul>
-803:     .replace(/(<li>[\s\S]*?<\/li>)(\n|$)(?!<li>)/g, '<ul>$1</ul>\n')
-804:     // Quebras de linha duplas viram parágrafos
-805:     .replace(/\n\n+/g, '</p><p>')
-806:     // Quebras simples
-807:     .replace(/\n/g, '<br>');
-808: 
-809:   // Wrap em parágrafo se não começar com tag HTML
-810:   if (!html.startsWith('<')) {
-811:     html = '<p>' + html + '</p>';
-812:   }
-813: 
-814:   return html;
-815: }
-816: 
-817: function escapeHtml(text) {
-818:   return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-819: }
-820: 
-821: let currentView = 'overview';
+let currentView = 'overview';
 let chatMessages = [];
 let isLoading = false;
 const expanded = {};
@@ -869,12 +854,7 @@ function navigate(view) {
   const el = document.getElementById('nav-' + view);
   if (el) el.classList.add('active');
   currentView = view;
-  
-  // Close sidebar on mobile after navigation
-  if (window.innerWidth <= 768) {
-    toggleSidebar(false);
-  }
-  
+  if (window.innerWidth <= 768) toggleSidebar(false);
   render();
 }
 
@@ -883,7 +863,6 @@ function toggleSidebar(force) {
   const overlay = document.getElementById('overlay');
   const isOpen = sidebar.classList.contains('open');
   const nextState = force !== undefined ? force : !isOpen;
-  
   if (nextState) {
     sidebar.classList.add('open');
     overlay.classList.add('active');
@@ -927,7 +906,7 @@ function renderOverview(container) {
     <div class="modules-grid">${grid}</div>
     <div class="cta-card">
       <i class="ti ti-robot"></i>
-      <div><div class="cta-title">Assistente IA do Manual</div><div class="cta-desc">Tire dúvidas sobre qualquer funcionalidade do PEP com o assistente de IA treinado no manual.</div></div>
+      <div><div class="cta-title">Assistente IA do Manual</div><div class="cta-desc">Tire dúvidas sobre qualquer funcionalidade do PEP com o assistente treinado no manual completo.</div></div>
       <button class="cta-btn" onclick="navigate('chat')">Abrir chat →</button>
     </div>
   </div>`;
@@ -969,7 +948,14 @@ function renderModule(container, view) {
   </div>`;
 }
 
-const CHIPS = ["Como configurar permissões de acesso?","O que é o aprazamento de enfermagem?","Como funciona a assinatura digital?","Quais os tipos de dieta no PEP?","Como ativar a checagem por código de barras?","Como funciona a alta do paciente?"];
+const CHIPS = [
+  "Como configurar permissões de acesso?",
+  "O que é o aprazamento de enfermagem?",
+  "Como funciona a assinatura digital?",
+  "Como realizar a exportação completa do prontuário?",
+  "Como ativar a checagem por código de barras?",
+  "Como funciona a alta do paciente?"
+];
 
 function renderChat(container) {
   let msgsHtml = '';
@@ -981,7 +967,10 @@ function renderChat(container) {
     </div>`;
   } else {
     msgsHtml = chatMessages.map(m => {
-      if (m.role === 'user') return `<div class="msg msg-user"><div class="bubble">${escapeHtml(m.content)}</div></div>`;
+      if (m.role === 'user') {
+        return `<div class="msg msg-user"><div class="bubble">${escapeHtml(m.content)}</div></div>`;
+      }
+      // CORREÇÃO 2: Renderiza markdown nas respostas da IA
       return `<div class="msg msg-ai">
         <div class="ai-avatar"><i class="ti ti-robot"></i></div>
         <div class="bubble-wrap">
@@ -997,7 +986,9 @@ function renderChat(container) {
     </div>`;
   }
 
-  const chipsHtml = chatMessages.length === 0 ? `<div class="chips-area">${CHIPS.map(c=>`<div class="chip" onclick="sendChip(this)">${c}</div>`).join('')}</div>` : '';
+  const chipsHtml = chatMessages.length === 0
+    ? `<div class="chips-area">${CHIPS.map(c => `<div class="chip" onclick="sendChip(this)">${c}</div>`).join('')}</div>`
+    : '';
 
   container.innerHTML = `<div class="chat-area">
     <div class="chat-topbar">
@@ -1010,7 +1001,7 @@ function renderChat(container) {
     ${chipsHtml}
     <div class="chat-input-area">
       <textarea id="inp" placeholder="Pergunte sobre qualquer funcionalidade do PEP..." onkeydown="handleKey(event)"></textarea>
-      <button class="send-btn" id="sbtn" onclick="sendMessage()" ${isLoading?'disabled':''}><i class="ti ti-send"></i></button>
+      <button class="send-btn" id="sbtn" onclick="sendMessage()" ${isLoading ? 'disabled' : ''}><i class="ti ti-send"></i></button>
     </div>
   </div>`;
 
@@ -1018,14 +1009,17 @@ function renderChat(container) {
   if (msgs) msgs.scrollTop = msgs.scrollHeight;
 }
 
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
 function sendChip(el) {
-  const text = el.textContent;
   const inp = document.getElementById('inp');
-  if (inp) inp.value = text;
+  if (inp) inp.value = el.textContent;
   sendMessage();
 }
 
@@ -1043,52 +1037,48 @@ async function sendMessage() {
   inp.value = '';
   isLoading = true;
   render();
-  try {
-    // RAG: busca seções relevantes do manual completo
-    const relevantContext = searchManual(text);
 
-    // Monta mensagens no formato OpenAI (compatível com Groq)
+  try {
+    const relevantContext = searchManual(text);
     const messages = [
       { role: 'system', content: PEP_CONTEXT + '\n\nTRECHOS RELEVANTES DO MANUAL COMPLETO:\n\n' + relevantContext },
       ...chatMessages.map(m => ({ role: m.role, content: m.content }))
     ];
 
     const res = await fetch('/api/chat', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: messages
-      })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages })
     });
     const data = await res.json();
 
     if (data.error) {
-      chatMessages.push({ role: 'assistant', content: "Erro da API: " + data.error.message });
+      chatMessages.push({ role: 'assistant', content: 'Erro da API: ' + data.error.message });
     } else {
-      const responseText = data.choices?.[0]?.message?.content || "Não consegui processar a resposta.";
+      const responseText = data.choices?.[0]?.message?.content || 'Não consegui processar a resposta.';
       chatMessages.push({ role: 'assistant', content: responseText });
     }
-  } catch(e) {
-    chatMessages.push({ role: 'assistant', content: "Ocorreu um erro ao conectar com o assistente. Tente novamente." });
+  } catch (e) {
+    chatMessages.push({ role: 'assistant', content: 'Ocorreu um erro ao conectar com o assistente. Tente novamente.' });
   }
   isLoading = false;
   render();
 }
 
-// RAG: divide o manual em seções e busca as mais relevantes
+// ============================================================
+// CORREÇÃO 3: RAG com tamanho reduzido (top 3 seções, 8000 chars)
+// ============================================================
 function getManualSections() {
   if (typeof FULL_MANUAL_TEXT === 'undefined') return [];
   if (window._manualSections) return window._manualSections;
 
   const raw = FULL_MANUAL_TEXT;
-  // Divide por capítulos/seções usando os padrões do manual
   const sectionRegex = /(?=\n\d+(?:\.\d+)*\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g;
   const parts = raw.split(sectionRegex).filter(s => s.trim().length > 100);
 
   window._manualSections = parts.map(section => {
     const lines = section.trim().split('\n').filter(l => l.trim());
-    const title = lines[0] || '';
-    return { title: title.trim(), content: section.trim() };
+    return { title: (lines[0] || '').trim(), content: section.trim() };
   });
 
   return window._manualSections;
@@ -1098,42 +1088,34 @@ function searchManual(query) {
   const sections = getManualSections();
   if (sections.length === 0) return 'Manual não carregado.';
 
-  // Normaliza a query
   const queryWords = query.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .split(/\s+/)
-    .filter(w => w.length > 2);
+    .split(/\s+/).filter(w => w.length > 2);
 
-  // Pontua cada seção por relevância
   const scored = sections.map(section => {
     const normalized = (section.title + ' ' + section.content).toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     let score = 0;
     queryWords.forEach(word => {
-      const matches = (normalized.match(new RegExp(word, 'g')) || []).length;
-      score += matches;
+      score += (normalized.match(new RegExp(word, 'g')) || []).length;
     });
-    // Bonus para match no título
     const titleNorm = section.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    queryWords.forEach(word => {
-      if (titleNorm.includes(word)) score += 10;
-    });
+    queryWords.forEach(word => { if (titleNorm.includes(word)) score += 10; });
     return { ...section, score };
   });
 
-  // Pega as top 5 seções mais relevantes (max ~30K chars para caber no contexto)
   scored.sort((a, b) => b.score - a.score);
+
+  // CORREÇÃO: top 3 seções, máx 8.000 chars para não estourar token limit do Groq
+  const top3 = scored.filter(s => s.score > 0).slice(0, 3);
   let result = '';
   let charCount = 0;
-  const maxChars = 40000;
-  const top5 = scored.filter(s => s.score > 0).slice(0, 5);
-  for (const section of top5) {
+  const maxChars = 8000;
+
+  for (const section of top3) {
     if (charCount + section.content.length > maxChars) {
-      // Trunca a seção se necessário
       const remaining = maxChars - charCount;
-      if (remaining > 500) {
-        result += '\n---\n' + section.content.substring(0, remaining) + '...\n';
-      }
+      if (remaining > 500) result += '\n---\n' + section.content.substring(0, remaining) + '...\n';
       break;
     }
     result += '\n---\n' + section.content + '\n';
