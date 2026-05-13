@@ -808,58 +808,58 @@ CONTEÚDO PRINCIPAL DO MANUAL (Visão Geral):
 
 11. OUTRAS ROTINAS: Oftalmologia (laudos e exames), AIH (laudo obrigatório em até 24h/48h configurável), APAC (procedimentos alta complexidade), Índice Prognóstico (APACHE II, SOFA), Notificação Compulsória (ativada por CID, envio por e-mail), Partograma, Curva de Crescimento Infantil, Interconsulta, Encaminhamento, Processo de Enfermagem (SAE), Ficha Anestésica.`;
 
-770: 11. OUTRAS ROTINAS: Oftalmologia (laudos e exames), AIH (laudo obrigatório em até 24h/48h configurável), APAC (procedimentos alta complexidade), Índice Prognóstico (APACHE II, SOFA), Notificação Compulsória (ativada por CID, envio por e-mail), Partograma, Curva de Crescimento Infantil, Interconsulta, Encaminhamento, Processo de Enfermagem (SAE), Ficha Anestésica.`;
-771: 
-772: // ============================================================
-773: // Markdown Renderer simples para as respostas da IA
-774: // ============================================================
-775: function renderMarkdown(text) {
-776:   let html = text
-777:     // Escapa HTML perigoso primeiro
-778:     .replace(/&/g, '&amp;')
-779:     .replace(/</g, '&lt;')
-780:     .replace(/>/g, '&gt;')
-781:     // Blocos de código (antes de outros processamentos)
-782:     .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-783:     // Títulos
-784:     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-785:     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-786:     .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-787:     // Negrito e itálico
-788:     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-789:     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-790:     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-791:     // Código inline
-792:     .replace(/`([^`]+)`/g, '<code>$1</code>')
-793:     // Blockquote
-794:     .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
-795:     // HR
-796:     .replace(/^---$/gm, '<hr>')
-797:     // Listas não ordenadas
-798:     .replace(/^\* (.+)$/gm, '<li>$1</li>')
-799:     .replace(/^- (.+)$/gm, '<li>$1</li>')
-800:     // Listas ordenadas
-801:     .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-802:     // Agrupa <li> em <ul>
-803:     .replace(/(<li>[\s\S]*?<\/li>)(\n|$)(?!<li>)/g, '<ul>$1</ul>\n')
-804:     // Quebras de linha duplas viram parágrafos
-805:     .replace(/\n\n+/g, '</p><p>')
-806:     // Quebras simples
-807:     .replace(/\n/g, '<br>');
-808: 
-809:   // Wrap em parágrafo se não começar com tag HTML
-810:   if (!html.startsWith('<')) {
-811:     html = '<p>' + html + '</p>';
-812:   }
-813: 
-814:   return html;
-815: }
-816: 
-817: function escapeHtml(text) {
-818:   return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-819: }
-820: 
-821: let currentView = 'overview';
+
+
+// ============================================================
+// Markdown Renderer simples para as respostas da IA
+// ============================================================
+function renderMarkdown(text) {
+  let html = text
+    // Escapa HTML perigoso primeiro
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Blocos de código (antes de outros processamentos)
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    // Títulos
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Negrito e itálico
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Código inline
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Blockquote
+    .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
+    // HR
+    .replace(/^---$/gm, '<hr>')
+    // Listas não ordenadas
+    .replace(/^\* (.+)$/gm, '<li>$1</li>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    // Listas ordenadas
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Agrupa <li> em <ul>
+    .replace(/(<li>[\s\S]*?<\/li>)(\n|$)(?!<li>)/g, '<ul>$1</ul>\n')
+    // Quebras de linha duplas viram parágrafos
+    .replace(/\n\n+/g, '</p><p>')
+    // Quebras simples
+    .replace(/\n/g, '<br>');
+
+  // Wrap em parágrafo se não começar com tag HTML
+  if (!html.startsWith('<')) {
+    html = '<p>' + html + '</p>';
+  }
+
+  return html;
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let currentView = 'overview';
 let chatMessages = [];
 let isLoading = false;
 const expanded = {};
