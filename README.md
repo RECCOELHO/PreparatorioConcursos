@@ -17,9 +17,19 @@ Projeto de estudo com interface para o Manual do PEP (SPDATA SGH® Versão 25) e
 npm install
 ```
 
-2. Inicie o servidor local:
+2. Configure a variável de ambiente `GROQ_API_KEY` se quiser usar a API real do Groq.
+
+No PowerShell:
+
+```powershell
+$env:GROQ_API_KEY = "sua_chave_aqui"
+npm start
+```
+
+No Linux/macOS:
 
 ```bash
+export GROQ_API_KEY="sua_chave_aqui"
 npm start
 ```
 
@@ -33,7 +43,7 @@ http://localhost:3000
 
 - `GET /` — serve `index.html`.
 - `GET /styles.css`, `/js/app.js`, `/data/content.json`, `/data/manual.txt` — serve arquivos estáticos.
-- `POST /api/chat` — responde com um mock de chat para testes locais.
+- `POST /api/chat` — se `GROQ_API_KEY` estiver definido, encaminha para a API do Groq; caso contrário, responde com um mock de chat local.
 
 ## Notas
 

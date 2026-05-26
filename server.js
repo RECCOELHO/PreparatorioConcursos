@@ -6,6 +6,52 @@ const url = require('url');
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname);
 
+let MANUAL_TEXT = null;
+let MANUAL_SECTIONS = null;
+
+// Carregar manual uma vez na inicialização
+function loadManual() {
+  try {
+    MANUAL_TEXT = fs.readFileSync(path.join(PUBLIC_DIR, 'data', 'manual.txt'), 'utf-8');
+    const sectionRegex = /(?=\n\d+(?:\.\d+)*\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g;
+    const parts = MANUAL_TEXT.split(sectionRegex).filter(s => s.trim().length > 100);
+    MANUAL_SECTIONS = parts.map(section => {
+      const lines = section.trim().split('\n').filter(l => l.trim());
+      const title = lines[0] || '';
+      return { title: title.trim(), content: section.trim() };
+    });
+  } catch (e) {
+    console.warn('Manual não carregado:', e.message);
+    MANUAL_SECTIONS = [];
+  }
+}
+
+// Busca RAG simples: encontra seções relevantes
+function searchManual(query) {
+  if (!MANUAL_SECTIONS || MANUAL_SECTIONS.length === 0) return '';
+  
+  const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  const scored = MANUAL_SECTIONS.map(section => {
+    const normalized = (section.title + ' ' + section.content).toLowerCase();
+    let score = 0;
+    queryWords.forEach(word => {
+      const matches = (normalized.match(new RegExp(word, 'g')) || []).length;
+      score += matches;
+    });
+    const titleNorm = section.title.toLowerCase();
+    queryWords.forEach(word => {
+      if (titleNorm.includes(word)) score += 10;
+    });
+    return { ...section, score };
+  });
+  
+  scored.sort((a, b) => b.score - a.score);
+  const top3 = scored.filter(s => s.score > 0).slice(0, 3);
+  
+  if (top3.length === 0) return '';
+  return top3.map(s => s.content.substring(0, 500)).join('\n---\n');
+}
+
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -54,13 +100,43 @@ const server = http.createServer(async (req, res) => {
     try {
       const raw = await getBody(req);
       const payload = JSON.parse(raw || '{}');
+      const apiKey = process.env.GROQ_API_KEY;
+
+      if (apiKey) {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: payload.messages || [],
+            temperature: 0.3,
+            max_tokens: 2048
+          })
+        });
+
+        const data = await response.json();
+        return sendJson(res, response.status, data);
+      }
+
+      // Mock com RAG local
       const userMessage = (payload.messages || []).reverse().find(m => m.role === 'user');
-      const userText = userMessage ? String(userMessage.content).slice(0, 300) : 'sem mensagem';
-      const reply = `Resposta mock do assistente local. Mensagem recebida: ${userText}`;
+      const userText = userMessage ? String(userMessage.content) : 'sem mensagem';
+      const relevantContext = searchManual(userText);
+      
+      let reply;
+      if (relevantContext) {
+        reply = `Com base no manual do PEP:\n\n${relevantContext}\n\n---\n\nPara uma resposta completa e precisa, configure GROQ_API_KEY para usar o assistente com IA.`;
+      } else {
+        reply = `Não encontrei seções do manual relacionadas a "${userText}". Configure GROQ_API_KEY para usar o assistente com IA para uma resposta mais completa.`;
+      }
+      
       return sendJson(res, 200, {
         id: 'mock-chat-1',
         object: 'chat.completion',
-        model: 'mock-local',
+        model: 'mock-local-rag',
         choices: [
           {
             index: 0,
@@ -96,6 +172,10 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
+loadManual();
 server.listen(PORT, () => {
   console.log(`Servidor local rodando em http://localhost:${PORT}`);
+  console.log(`Manual carregado: ${MANUAL_SECTIONS.length} seções`);
+  console.log(`Use GROQ_API_KEY para ativar o assistente com IA.`);
 });
+
