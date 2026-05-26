@@ -1,0 +1,5 @@
+Manual completo não incluído neste repositório.
+
+Adicione o texto completo do manual em `data/manual.txt` para habilitar buscas RAG no assistente.
+
+Formato recomendado: capítulos numerados com linhas iniciando por "1. ", "2. ", etc., para que a divisão por seções funcione corretamente.
