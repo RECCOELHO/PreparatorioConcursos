@@ -5,6 +5,12 @@ let currentView = 'overview';
 let chatMessages = [];
 let isLoading = false;
 const expanded = {};
+const CHAT_PROVIDERS = [
+  { id: 'groq', label: 'GROQ', desc: 'llama-3.3-70b-versatile' },
+  { id: 'cloude', label: 'Cloude', desc: 'Cloud AI' },
+  { id: 'gemini', label: 'Gemini', desc: 'Google Gemini' }
+];
+let selectedProvider = localStorage.getItem('pepChatProvider') || 'groq';
 const CHIPS = ["Como configurar permissões de acesso?","O que é o aprazamento de enfermagem?","Como funciona a assinatura digital?","Quais os tipos de dieta no PEP?","Como ativar a checagem por código de barras?","Como funciona a alta do paciente?"];
 let PEP_CONTEXT = `Você é um assistente especialista no Manual do PEP (Prontuário Eletrônico do Paciente) Hospital Geral — SPDATA SGH® Versão 25.`;
 
@@ -139,11 +145,16 @@ function renderChat(container) {
 
   const chipsHtml = chatMessages.length === 0 ? `<div class="chips-area">${CHIPS.map(c=>`<div class="chip" onclick="sendChip(this)">${c}</div>`).join('')}</div>` : '';
 
+  const providerOptions = CHAT_PROVIDERS.map(p => `<option value="${p.id}" ${selectedProvider === p.id ? 'selected' : ''}>${p.label}</option>`).join('');
   container.innerHTML = `<div class="chat-area">
     <div class="chat-topbar">
       <div class="menu-toggle" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></div>
       <div class="back-btn" onclick="navigate('overview')"><i class="ti ti-arrow-left"></i></div>
       <div class="ct-title">Assistente IA</div>
+      <div class="provider-select">
+        <label for="provider-select">IA:</label>
+        <select id="provider-select" onchange="changeChatProvider(event)">${providerOptions}</select>
+      </div>
       ${chatMessages.length > 0 ? `<button class="clear-btn" onclick="clearChat()">Limpar</button>` : ''}
     </div>
     <div class="chat-messages" id="msgs">${msgsHtml}</div>
@@ -187,6 +198,7 @@ function toggleCard(id) {
 
 function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 function sendChip(el) { const text = el.textContent; const inp = document.getElementById('inp'); if (inp) inp.value = text; sendMessage(); }
+function changeChatProvider(e) { selectedProvider = e.target.value; localStorage.setItem('pepChatProvider', selectedProvider); }
 function clearChat() { chatMessages = []; render(); }
 
 // --- Manual search (RAG) ---
@@ -237,7 +249,7 @@ async function sendMessage() {
   try {
     const relevantContext = searchManual(text);
     const messages = [ { role: 'system', content: PEP_CONTEXT + '\n\nTRECHOS RELEVANTES DO MANUAL COMPLETO:\n\n' + relevantContext }, ...chatMessages.map(m => ({ role: m.role, content: m.content })) ];
-    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages }) });
+    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages, provider: selectedProvider }) });
     const data = await res.json();
     if (data.error) { chatMessages.push({ role: 'assistant', content: 'Erro da API: ' + (data.error.message || String(data.error)) }); }
     else {

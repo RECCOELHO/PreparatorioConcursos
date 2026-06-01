@@ -17,7 +17,11 @@ Projeto de estudo com interface para o Manual do PEP (SPDATA SGH® Versão 25) e
 npm install
 ```
 
-2. Configure a variável de ambiente `GROQ_API_KEY` se quiser usar a API real do Groq.
+2. Configure a variável de ambiente do provedor de IA que você quer usar.
+
+- `GROQ_API_KEY` para o provedor Groq
+- `CLOUDE_API_KEY` para o provedor Cloude
+- `GEMINI_API_KEY` para o provedor Gemini
 
 No PowerShell:
 
@@ -33,6 +37,8 @@ export GROQ_API_KEY="sua_chave_aqui"
 npm start
 ```
 
+Para usar `Cloude` ou `Gemini`, substitua `GROQ_API_KEY` por `CLOUDE_API_KEY` ou `GEMINI_API_KEY`.
+
 3. Abra no navegador:
 
 ```text
@@ -43,7 +49,17 @@ http://localhost:3000
 
 - `GET /` — serve `index.html`.
 - `GET /styles.css`, `/js/app.js`, `/data/content.json`, `/data/manual.txt` — serve arquivos estáticos.
-- `POST /api/chat` — se `GROQ_API_KEY` estiver definido, encaminha para a API do Groq; caso contrário, responde com um mock de chat local.
+- `POST /api/chat` — se a chave de API do provedor selecionado estiver definida, encaminha para essa API; caso contrário, responde com um mock de chat local.
+
+## Vercel e variáveis de ambiente
+
+No Vercel, defina as variáveis de ambiente na dashboard do projeto:
+
+- `GROQ_API_KEY` para Groq
+- `CLOUDE_API_KEY` para Cloude
+- `GEMINI_API_KEY` para Gemini
+
+Depois disso, abra o chat no frontend e selecione o provedor desejado no menu de IA.
 
 ## Notas
 

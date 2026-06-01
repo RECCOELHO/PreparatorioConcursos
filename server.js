@@ -100,18 +100,38 @@ const server = http.createServer(async (req, res) => {
     try {
       const raw = await getBody(req);
       const payload = JSON.parse(raw || '{}');
-      const apiKey = process.env.GROQ_API_KEY;
+      const provider = String(payload.provider || 'groq').toLowerCase();
+      const providers = {
+        groq: {
+          apiKey: process.env.GROQ_API_KEY,
+          url: 'https://api.groq.com/openai/v1/chat/completions',
+          model: 'llama-3.3-70b-versatile'
+        },
+        cloude: {
+          apiKey: process.env.CLOUDE_API_KEY,
+          url: 'https://api.cloude.ai/v1/chat/completions',
+          model: 'cloude-2.1'
+        },
+        gemini: {
+          apiKey: process.env.GEMINI_API_KEY,
+          url: 'https://gemini.googleapis.com/v1/chat/completions',
+          model: 'gemini-pro'
+        }
+      };
 
-      if (apiKey) {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const config = providers[provider] || providers.groq;
+      const messages = payload.messages || [];
+
+      if (config.apiKey) {
+        const response = await fetch(config.url, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${config.apiKey}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: payload.messages || [],
+            model: config.model,
+            messages,
             temperature: 0.3,
             max_tokens: 2048
           })
@@ -121,18 +141,17 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, response.status, data);
       }
 
-      // Mock com RAG local
-      const userMessage = (payload.messages || []).reverse().find(m => m.role === 'user');
+      const userMessage = messages.slice().reverse().find(m => m.role === 'user');
       const userText = userMessage ? String(userMessage.content) : 'sem mensagem';
       const relevantContext = searchManual(userText);
-      
       let reply;
+
       if (relevantContext) {
-        reply = `Com base no manual do PEP:\n\n${relevantContext}\n\n---\n\nPara uma resposta completa e precisa, configure GROQ_API_KEY para usar o assistente com IA.`;
+        reply = `Com base no manual do PEP:\n\n${relevantContext}\n\n---\n\nPara obter respostas com IA real, configure a variável de ambiente ${provider.toUpperCase()}_API_KEY e escolha o provedor ${provider.toUpperCase()}.`;
       } else {
-        reply = `Não encontrei seções do manual relacionadas a "${userText}". Configure GROQ_API_KEY para usar o assistente com IA para uma resposta mais completa.`;
+        reply = `Não encontrei seções do manual relacionadas a "${userText}". Configure a variável de ambiente ${provider.toUpperCase()}_API_KEY e escolha o provedor ${provider.toUpperCase()} para usar a IA real.`;
       }
-      
+
       return sendJson(res, 200, {
         id: 'mock-chat-1',
         object: 'chat.completion',
@@ -176,6 +195,6 @@ loadManual();
 server.listen(PORT, () => {
   console.log(`Servidor local rodando em http://localhost:${PORT}`);
   console.log(`Manual carregado: ${MANUAL_SECTIONS.length} seções`);
-  console.log(`Use GROQ_API_KEY para ativar o assistente com IA.`);
+  console.log(`Use GROQ_API_KEY, CLOUDE_API_KEY ou GEMINI_API_KEY para ativar o assistente com IA.`);
 });
 
